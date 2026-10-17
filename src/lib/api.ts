@@ -185,18 +185,23 @@ export async function updateOrderStatus(id: string, status: string): Promise<voi
   if (error) throw error;
 }
 
+const LOVABLE_PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID || "lmaotaqkaczqfkpsxxbw";
+const LOVABLE_ANON_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtYW90YXFrYWN6cWZrcHN4eGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwMTcwMzUsImV4cCI6MjA4ODU5MzAzNX0.KW8YWWcjDLLcMwaFYBdkjJFwjoTkyqdV8J6ONS_yTvk";
+
 const VERIFIED_EMAIL_ENDPOINT = "https://pzgqgznbesvxkbnmsjeu.supabase.co/functions/v1/test-purchase-email";
 const VERIFIED_EMAIL_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6Z3Fnem5iZXN2eGtibm1zamV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2Njc5NTAsImV4cCI6MjA5ODI0Mzk1MH0.damXqHbWGXThuR-2T5wP-k5Qi5LVZqWrbH_oiIiczT4";
 
 export async function resendOrderEmail(orderId: string): Promise<void> {
   // Try invoking backend edge function if configured, or update local status
   try {
-    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    const projectId = LOVABLE_PROJECT_ID;
     const res = await fetch(`https://${projectId}.supabase.co/functions/v1/test-purchase-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        apikey: LOVABLE_ANON_KEY,
       },
       body: JSON.stringify({ order_id: orderId }),
     });
@@ -230,12 +235,12 @@ export async function resendOrderEmail(orderId: string): Promise<void> {
 
 export async function sendTestAdminEmail(toEmail: string): Promise<{ success: boolean; message: string }> {
   try {
-    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    const projectId = LOVABLE_PROJECT_ID;
     let response = await fetch(`https://${projectId}.supabase.co/functions/v1/test-purchase-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        apikey: LOVABLE_ANON_KEY,
       },
       body: JSON.stringify({ to: toEmail }),
     });
@@ -298,12 +303,12 @@ export async function createMPPreference(params: {
   payer?: { name: string; email: string };
   external_reference: string;
 }): Promise<{ id: string; init_point: string; sandbox_init_point: string }> {
-  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  const projectId = LOVABLE_PROJECT_ID;
   const response = await fetch(`https://${projectId}.supabase.co/functions/v1/create-mp-preference`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      apikey: LOVABLE_ANON_KEY,
     },
     body: JSON.stringify(params),
   });
@@ -328,12 +333,12 @@ export async function createMPPixPayment(params: {
   qr_code_base64: string;
   expires_at: string | null;
 }> {
-  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  const projectId = LOVABLE_PROJECT_ID;
   const response = await fetch(`https://${projectId}.supabase.co/functions/v1/create-mp-pix-payment`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      apikey: LOVABLE_ANON_KEY,
     },
     body: JSON.stringify(params),
   });
@@ -350,12 +355,12 @@ export async function checkOrderPaymentStatus(params: {
   order_id: string;
   user_email: string;
 }): Promise<{ status: string; approved: boolean }> {
-  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  const projectId = LOVABLE_PROJECT_ID;
   const response = await fetch(`https://${projectId}.supabase.co/functions/v1/check-mp-payment-status`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      apikey: LOVABLE_ANON_KEY,
     },
     body: JSON.stringify(params),
   });
