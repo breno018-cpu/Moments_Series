@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ReelShort-like: pure black canvas, white type, hot red accent */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 100%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 350 90% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 88%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 24 95% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 350 90% 61%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 350 90% 61%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 85%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 350 90% 61%;
+
+    --neon: 350 90% 61%;
+    --neon-glow: 350 95% 70%;
+    --neon-soft: 350 80% 55%;
+
+    --warm: 24 95% 55%;
+    --warm-glow: 30 100% 62%;
+
+    --card-hover: 0 0% 14%;
+    --card-glow: 350 90% 61%;
+
+    --star-filled: 42 100% 55%;
+    --star-empty: 0 0% 22%;
+
+    --success: 150 70% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --drama-pink: 350 90% 61%;
+    --drama-gold: 42 100% 55%;
+    --drama-warm: 24 95% 55%;
+
+    --cozy-amber: 30 100% 58%;
+    --cozy-glow: 24 60% 20%;
+
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  p, span, a, button, input, textarea, label {
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+    color: hsl(var(--foreground));
+  }
+}
+
+
+
+/* ========== FADE ON SCROLL (slower, gentler = comfort) ========== */
+.fade-section {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========== MODAL ENTER ========== */
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ========== SKELETON LOADER ========== */
+.skeleton {
+  background: linear-gradient(
+    110deg,
+    hsl(20 6% 9%) 0%,
+    hsl(20 6% 9%) 35%,
+    hsl(20 6% 13%) 50%,
+    hsl(20 6% 9%) 65%,
+    hsl(20 6% 9%) 100%
+  );
+  background-size: 250% 100%;
+  animation: shimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 250% 0; }
+  100% { background-position: -250% 0; }
+}
+
+/* ========== HERO PROGRESS BAR ========== */
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* ========== SCROLLBAR (thinner, subtler) ========== */
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.12);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.25);
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ========== GLASSMORPHISM (warmer) ========== */
+.glass {
+  background: hsl(var(--card) / 0.65);
+  backdrop-filter: blur(20px);
+  border: 1px solid hsl(var(--border) / 0.15);
+}
+
+/* ========== FOCUS STATES ========== */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary) / 0.4);
+  outline-offset: 2px;
+}
+
+/* ========== WARM AMBIENT GLOW (neuroscience: peripheral warmth) ========== */
+.drama-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--cozy-amber) / 0.05), transparent);
+}
+
+.drama-card-shine {
+  position: relative;
+  overflow: hidden;
+}
+.drama-card-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, hsl(var(--warm) / 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ========== COZY TAB INDICATOR ========== */
+.tab-active-pill {
+  background: transparent;
+  border: none;
+}
+
+/* ReelShort-style underline nav */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 3px;
+  border-radius: 999px;
+  background: hsl(var(--foreground));
+}
+
+/* ========== WELCOME SECTION ========== */
+.welcome-gradient {
+  background: none;
+}
+

@@ -1,0 +1,7 @@
+project_id = "lmaotaqkaczqfkpsxxbw"
+
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.toggle-maintenance]
+    verify_jwt = false
