@@ -56,7 +56,11 @@ const Index = () => {
   const [ageVerifySerie, setAgeVerifySerie] = useState<Serie | null>(null);
   const [ageVerifyForTab, setAgeVerifyForTab] = useState(false);
   const [ageVerifiedIds, setAgeVerifiedIds] = useState<Set<string>>(() => {
-    return sessionStorage.getItem("age_verified") === "true" ? new Set(["__all__"]) : new Set();
+    try {
+      return sessionStorage.getItem("age_verified") === "true" ? new Set(["__all__"]) : new Set();
+    } catch {
+      return new Set();
+    }
   });
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
 

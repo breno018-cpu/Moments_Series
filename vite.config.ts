@@ -19,11 +19,12 @@ export default defineConfig(() => ({
     },
   },
   build: {
+    target: ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
-          "vendor-react": ["react", "react-dom", "react-router-dom"],
+          "vendor-react": ["react", "react-dom", "react/jsx-runtime", "react-router-dom"],
           "vendor-supabase": ["@supabase/supabase-js", "@tanstack/react-query"],
           "vendor-motion": ["framer-motion", "gsap", "@gsap/react"],
           "vendor-charts": ["recharts"],

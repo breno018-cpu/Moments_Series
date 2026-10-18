@@ -7,15 +7,8 @@ const LS_KEY = "hb_overlay_state"; // "on" | "off"
 const SYS_PREFIX = "/sys/";
 
 const MaintenanceOverlay = () => {
-  const [enabled, setEnabled] = useState<boolean>(() => {
-    // Sync init from localStorage so it shows instantly, before DB roundtrip
-    if (typeof window === "undefined") return false;
-    if (window.location.pathname.startsWith(SYS_PREFIX)) return false;
-    return localStorage.getItem(LS_KEY) === "on";
-  });
-  const [ready, setReady] = useState<boolean>(() => {
-    return typeof window !== "undefined" && localStorage.getItem(LS_KEY) !== null;
-  });
+  const [enabled, setEnabled] = useState<boolean>(false);
+  const [ready, setReady] = useState<boolean>(false);
   const [dots, setDots] = useState("");
 
   useEffect(() => {
@@ -28,11 +21,13 @@ const MaintenanceOverlay = () => {
     fetchMaintenanceMode()
       .then((cfg: MaintenanceModeConfig) => {
         const on = !!cfg?.enabled;
-        localStorage.setItem(LS_KEY, on ? "on" : "off");
+        try {
+          localStorage.setItem(LS_KEY, on ? "on" : "off");
+        } catch {}
         setEnabled(on);
       })
       .catch(() => {
-        // Keep whatever localStorage says; default off
+        setEnabled(false);
       })
       .finally(() => setReady(true));
   }, []);
