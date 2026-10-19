@@ -139,7 +139,7 @@ export const FullCatalogSection: React.FC<FullCatalogSectionProps> = ({
         {/* Right: Counter text */}
         <div className="text-zinc-400 text-xs sm:text-sm font-medium whitespace-nowrap self-end sm:self-center shrink-0 pr-1">
           {activeGenre === "todos"
-            ? (safeSeries.length >= 500 ? safeSeries.length : 510)
+            ? "1.5k"
             : filteredSeries.length}{" "}
           títulos disponíveis
         </div>

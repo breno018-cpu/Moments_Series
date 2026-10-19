@@ -208,7 +208,7 @@ const SeriesListItem = memo(({
             onClick={() => onBuy?.(serie)}
             className="ml-auto flex items-center justify-center gap-1 px-3.5 h-8 bg-primary text-primary-foreground text-[11px] md:text-xs font-body font-bold rounded-full hover:bg-primary/85 transition-colors"
           >
-            <Play size={11} fill="currentColor" /> Comprar
+            <Play size={11} fill="currentColor" /> Garantir
           </button>
           <button
             onClick={() => { if (!inCart) addToCart(serie); }}
@@ -243,11 +243,11 @@ const SeriesRow = memo(({ title, series, onSelect, onBuy, showRank = false, layo
   if (showRank) {
     return (
       <section ref={fadeRef} className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-10 lg:px-12 my-6 sm:my-8 md:my-10 fade-section">
-        <div className="rounded-3xl border border-amber-900/40 bg-gradient-to-b from-[#18130e]/95 via-[#120f0d]/90 to-[#0a0a0a]/80 p-5 sm:p-7 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-md">
+        <div className="rounded-3xl border border-rose-900/40 bg-gradient-to-b from-[#181113]/95 via-[#120e10]/90 to-[#0a0a0a]/80 p-5 sm:p-7 md:p-8 shadow-2xl relative overflow-hidden backdrop-blur-md">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full mb-2">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-full mb-2">
                 🔥 RANKING OFICIAL DOS ASSINANTES
               </span>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight">
@@ -258,7 +258,7 @@ const SeriesRow = memo(({ title, series, onSelect, onBuy, showRank = false, layo
               </p>
             </div>
 
-            <div className="self-start sm:self-auto inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 bg-amber-950/50 border border-amber-800/50 px-3.5 py-1.5 rounded-xl shadow-xs">
+            <div className="self-start sm:self-auto inline-flex items-center gap-1.5 text-xs font-semibold text-rose-200 bg-rose-950/50 border border-rose-800/50 px-3.5 py-1.5 rounded-xl shadow-xs">
               <span>🏆</span>
               <span>Atualizado em tempo real</span>
             </div>

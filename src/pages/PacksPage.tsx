@@ -192,7 +192,7 @@ const PacksPage = () => {
                         className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-body font-semibold rounded-full"
                       >
                         <ShoppingCart size={16} />
-                        Comprar plano
+                        Garantir plano
                       </Button>
                     </div>
                   </div>
