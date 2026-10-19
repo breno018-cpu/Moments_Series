@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SlidersHorizontal, X, Star, TrendingUp, DollarSign } from "lucide-react";
+import { SlidersHorizontal, X, Star, TrendingUp, DollarSign, Flame, Zap, Mic, MessageSquare, Tv } from "lucide-react";
 import { Serie } from "@/data/series";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -130,12 +130,12 @@ const FiltersBar = ({ allSeries, filters, onChange }: FiltersBarProps) => {
 
   const pillItems = [
     { id: "todos", label: "Todos", count: counts.todos, icon: null },
-    { id: "maisVendidos", label: "Mais Vendidos", count: counts.maisVendidos, icon: "🔥" },
-    { id: "lancamentos", label: "Lançamentos", count: counts.lancamentos, icon: "⚡" },
-    { id: "dublados", label: "Dublados", count: counts.dublados, icon: "🎙️" },
-    { id: "legendados", label: "Legendados", count: counts.legendados, icon: "💬" },
-    { id: "animes", label: "Animes", count: counts.animes, icon: "🎌" },
-    { id: "topAvaliados", label: "Top Avaliados", count: counts.topAvaliados, icon: "⭐" },
+    { id: "maisVendidos", label: "Mais Vendidos", count: counts.maisVendidos, icon: Flame },
+    { id: "lancamentos", label: "Lançamentos", count: counts.lancamentos, icon: Zap },
+    { id: "dublados", label: "Dublados", count: counts.dublados, icon: Mic },
+    { id: "legendados", label: "Legendados", count: counts.legendados, icon: MessageSquare },
+    { id: "animes", label: "Animes", count: counts.animes, icon: Tv },
+    { id: "topAvaliados", label: "Top Avaliados", count: counts.topAvaliados, icon: Star },
   ];
 
   return (
@@ -143,6 +143,7 @@ const FiltersBar = ({ allSeries, filters, onChange }: FiltersBarProps) => {
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
         {pillItems.map((item) => {
           const isActive = activeCategory === item.id;
+          const Icon = item.icon;
           return (
             <motion.button
               key={item.id}
@@ -150,11 +151,16 @@ const FiltersBar = ({ allSeries, filters, onChange }: FiltersBarProps) => {
               onClick={() => handleQuickCategory(item.id)}
               className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-body font-semibold transition-all duration-200 flex-shrink-0 border ${
                 isActive
-                  ? "bg-gradient-to-r from-[#7B3FE4] to-[#5B21B6] text-white border-purple-400/40 shadow-md shadow-purple-950/30"
+                  ? "bg-gradient-to-r from-rose-600 to-rose-700 text-white border-rose-500/40 shadow-md shadow-rose-950/30"
                   : "bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border-zinc-800/90 hover:text-white"
               }`}
             >
-              {item.icon && <span className="text-xs">{item.icon}</span>}
+              {Icon && (
+                <Icon
+                  size={14}
+                  className={isActive ? "text-white" : "text-rose-400"}
+                />
+              )}
               <span>{item.label}</span>
               <span
                 className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
@@ -173,14 +179,14 @@ const FiltersBar = ({ allSeries, filters, onChange }: FiltersBarProps) => {
           onClick={() => setOpen(!open)}
           className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-body font-medium transition-all duration-200 border flex-shrink-0 ml-auto ${
             open || hasActive
-              ? "bg-purple-950/60 border-purple-500/40 text-purple-300"
+              ? "bg-rose-950/60 border-rose-500/40 text-rose-300"
               : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200"
           }`}
         >
           <SlidersHorizontal size={13} />
           <span className="hidden sm:inline">Filtros Avançados</span>
           {activeCount > 0 && (
-            <span className="bg-purple-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+            <span className="bg-rose-600 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
               {activeCount}
             </span>
           )}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Package, ShoppingCart, Star, Tag } from "lucide-react";
+import { Package, ShoppingCart, Star, Tag, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import CheckoutModal from "@/components/CheckoutModal";
@@ -208,14 +208,18 @@ const PacksPage = () => {
       <footer className="px-4 md:px-12 lg:px-16 py-10 border-t border-border/10">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
-            <h4 className="text-2xl font-display text-foreground/80 tracking-[0.12em] mb-1">HANGAR <span className="text-primary">❤️</span> BOX</h4>
+            <h4 className="text-2xl font-display text-foreground/80 tracking-[0.12em] mb-1 flex items-center justify-center md:justify-start gap-1">
+              HANGAR <Heart size={16} className="text-primary fill-primary mx-0.5" /> BOX
+            </h4>
             <p className="text-xs font-body text-muted-foreground/50">Séries, livros e conteúdos exclusivos para você.</p>
           </div>
           <div className="flex gap-6 text-xs font-body text-muted-foreground/40">
             <a href="/" className="hover:text-foreground/60 transition-colors">Início</a>
           </div>
         </div>
-        <p className="text-center text-[10px] font-body text-muted-foreground/30 mt-6">© 2026 Hangar ❤️ Box. Todos os direitos reservados.</p>
+        <p className="text-center text-[10px] font-body text-muted-foreground/30 mt-6 flex items-center justify-center gap-1">
+          © 2026 Hangar <Heart size={11} className="text-primary fill-primary mx-0.5" /> Box. Todos os direitos reservados.
+        </p>
         <p className="text-center text-[10px] font-body text-muted-foreground/40 mt-2">Desenvolvido por <span className="text-primary/70 font-semibold">PixelLoom</span></p>
       </footer>
 

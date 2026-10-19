@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Info, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Info, Star, Check } from "lucide-react";
 import { Serie } from "@/data/series";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -129,7 +129,7 @@ const HeroCarousel = memo(({ series, onDetails, onBuy }: HeroCarouselProps) => {
                 </span>
 
                 <span className="text-emerald-400 flex items-center gap-1 font-bold text-xs sm:text-sm">
-                  <span className="text-emerald-400">✓</span> Episódios Completos
+                  <Check size={14} className="text-emerald-400 stroke-[3]" /> Episódios Completos
                 </span>
               </motion.div>
 

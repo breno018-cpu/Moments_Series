@@ -147,19 +147,19 @@ const SeriesDetailModal = ({ serie, onClose, onBuy }: SeriesDetailModalProps) =>
             {/* Guarantee checkmarks */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 my-3 p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-[11px] text-zinc-300">
               <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                <span>✓</span>
+                <Check size={14} className="text-emerald-400 flex-shrink-0" />
                 <span className="text-zinc-200">Acesso Vitalício (Sem mensalidades)</span>
               </div>
               <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                <span>✓</span>
+                <Check size={14} className="text-emerald-400 flex-shrink-0" />
                 <span className="text-zinc-200">Assista no Celular, Smart TV ou PC</span>
               </div>
               <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                <span>✓</span>
+                <Check size={14} className="text-emerald-400 flex-shrink-0" />
                 <span className="text-zinc-200">Episódios Completos em Alta Resolução</span>
               </div>
               <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                <span>✓</span>
+                <Check size={14} className="text-emerald-400 flex-shrink-0" />
                 <span className="text-zinc-200">Entrega Automática e Imediata</span>
               </div>
             </div>

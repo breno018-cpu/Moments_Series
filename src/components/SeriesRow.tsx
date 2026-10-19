@@ -1,5 +1,5 @@
 import { useState, useEffect, memo, useCallback } from "react";
-import { Star, Play, ShoppingCart, Check, Flame, ChevronDown, ChevronUp } from "lucide-react";
+import { Star, Play, ShoppingCart, Check, Flame, ChevronDown, ChevronUp, Trophy } from "lucide-react";
 import { Serie } from "@/data/series";
 import { useFadeIn } from "@/hooks/useFadeIn";
 import { useCart } from "@/contexts/CartContext";
@@ -38,7 +38,7 @@ export const SeriesCard = memo(({
       {/* Top Left: Rank badge (Top 10) or Top Seller */}
       {showRank && idx < 10 ? (
         <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 bg-[#F59E0B] text-zinc-950 font-display font-black text-[11px] px-2.5 py-0.5 rounded-md shadow-md uppercase tracking-wider group-hover:scale-105 transition-transform">
-          <span className="text-[10px]">🔥</span>
+          <Flame size={12} className="fill-current text-zinc-950" />
           <span>TOP {idx + 1}</span>
         </div>
       ) : topSeller ? (
@@ -248,7 +248,7 @@ const SeriesRow = memo(({ title, series, onSelect, onBuy, showRank = false, layo
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 border border-rose-500/30 px-3 py-1 rounded-full mb-2">
-                🔥 RANKING OFICIAL DOS ASSINANTES
+                <Flame size={12} className="text-rose-400 fill-rose-400/20" /> RANKING OFICIAL DOS ASSINANTES
               </span>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-extrabold text-white tracking-tight">
                 Top 10 Mais Assistidos & Destaques
@@ -259,7 +259,7 @@ const SeriesRow = memo(({ title, series, onSelect, onBuy, showRank = false, layo
             </div>
 
             <div className="self-start sm:self-auto inline-flex items-center gap-1.5 text-xs font-semibold text-rose-200 bg-rose-950/50 border border-rose-800/50 px-3.5 py-1.5 rounded-xl shadow-xs">
-              <span>🏆</span>
+              <Trophy size={13} className="text-rose-300" />
               <span>Atualizado em tempo real</span>
             </div>
           </div>

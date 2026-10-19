@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { Sparkles, Sun, Moon, Heart } from "lucide-react";
 import Logo from "@/components/Logo";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -28,12 +29,12 @@ const dbSerieToSerie = (db: DbSerie): Serie => ({
   is_adult: db.is_adult,
 });
 
-const getGreeting = (): string => {
+const getGreetingInfo = () => {
   const h = new Date().getHours();
-  if (h < 6) return "Boa madrugada 🌙";
-  if (h < 12) return "Bom dia ☀️";
-  if (h < 18) return "Boa tarde 🌤";
-  return "Boa noite ✨";
+  if (h < 6) return { text: "Boa madrugada", Icon: Moon };
+  if (h < 12) return { text: "Bom dia", Icon: Sun };
+  if (h < 18) return { text: "Boa tarde", Icon: Sun };
+  return { text: "Boa noite", Icon: Sparkles };
 };
 
 const Index = () => {
@@ -324,13 +325,21 @@ const Index = () => {
       <HeroCarousel series={heroSeries} onDetails={handleSelectSerie} onBuy={handleDirectBuy} />
 
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-10 lg:px-12 pt-6 md:pt-8 pb-1">
-        <p className="text-xs sm:text-sm md:text-base font-body text-foreground/45">{getGreeting()} — o que vamos assistir hoje?</p>
+        {(() => {
+          const { text, Icon } = getGreetingInfo();
+          return (
+            <p className="flex items-center gap-1.5 text-xs sm:text-sm md:text-base font-body text-foreground/45">
+              <Icon size={14} className="text-rose-400/80 flex-shrink-0" />
+              <span>{text} — o que vamos assistir hoje?</span>
+            </p>
+          );
+        })()}
       </div>
 
       <div className="relative z-10">
         {activeTab.isExclusive && activeTab.filterCategory ? (
           <SeriesRow
-            title={`🔥 ${activeTab.label}`}
+            title={activeTab.label}
             series={[...filteredSeries].sort((a, b) => b.vendas_count - a.vendas_count)}
             onSelect={handleSelectSerie}
             onBuy={handleDirectBuy}
@@ -385,7 +394,9 @@ const Index = () => {
             <button onClick={() => navigate("/admin")} className="hover:text-primary text-muted-foreground/45 transition-colors duration-300">Admin</button>
           </div>
         </div>
-        <p className="text-center text-[9px] md:text-[10px] font-body text-muted-foreground/25 mt-4 md:mt-6">© 2026 Hangar ❤️ Box. Todos os direitos reservados.</p>
+        <p className="text-center text-[9px] md:text-[10px] font-body text-muted-foreground/25 mt-4 md:mt-6 flex items-center justify-center gap-1">
+          © 2026 Hangar <Heart size={11} className="text-primary fill-primary mx-0.5" /> Box. Todos os direitos reservados.
+        </p>
         <p className="text-center text-[9px] md:text-[10px] font-body text-muted-foreground/40 mt-2">Desenvolvido por <span className="text-primary/70 font-semibold">PixelLoom</span></p>
       </footer>
 
