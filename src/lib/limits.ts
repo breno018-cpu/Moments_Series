@@ -5,8 +5,8 @@
 
 export const PLATFORM_LIMITS = {
   // Catalog capacity
-  SERIES_MAX: 100,
-  SERIES_EPISODES_MAX: 1000,
+  SERIES_MAX: 5000,
+  SERIES_EPISODES_MAX: 50000,
 
   // Promotional coupons limit
   COUPONS_MAX: 25,
@@ -30,7 +30,7 @@ export interface LimitCheckResult {
   max: number;
 }
 
-/** Check if new series creation is allowed under the 100-item ceiling */
+/** Check if new series creation is allowed under the catalog ceiling */
 export function canCreateSerie(currentCount: number): LimitCheckResult {
   const allowed = currentCount < PLATFORM_LIMITS.SERIES_MAX;
   return {

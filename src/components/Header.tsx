@@ -172,7 +172,7 @@ const Header = memo(({ onSearch, onOpenCart, onCheckout, onCategoryChange, activ
             >
               <ShoppingCart size={18} className="transition-transform group-hover:rotate-6" />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-purple-500 to-rose-500 text-white text-[10px] font-mono font-black rounded-full flex items-center justify-center min-w-[18px] h-[18px] shadow-md border border-[#0a0a0c] animate-scale-in">
+                <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-red-600 to-rose-600 text-white text-[10px] font-mono font-black rounded-full flex items-center justify-center min-w-[18px] h-[18px] shadow-md border border-[#0a0a0c] animate-scale-in">
                   {totalItems}
                 </span>
               )}
@@ -185,13 +185,13 @@ const Header = memo(({ onSearch, onOpenCart, onCheckout, onCategoryChange, activ
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.95 }}
                   transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute right-0 top-full mt-2.5 w-80 sm:w-88 bg-[#121118]/95 backdrop-blur-2xl border border-amber-900/40 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-50 overflow-hidden"
+                  className="absolute right-0 top-full mt-2.5 w-80 sm:w-88 bg-[#121118]/95 backdrop-blur-2xl border border-rose-900/40 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-50 overflow-hidden"
                   onMouseEnter={handleCartEnter}
                   onMouseLeave={handleCartLeave}
                 >
                   {items.length === 0 ? (
                     <div className="p-6 text-center">
-                      <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3 text-purple-400 shadow-inner">
+                      <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3 text-primary shadow-inner">
                         <ShoppingCart size={22} />
                       </div>
                       <h4 className="text-sm font-display font-bold text-white mb-1">
@@ -206,7 +206,7 @@ const Header = memo(({ onSearch, onOpenCart, onCheckout, onCategoryChange, activ
                           const el = document.getElementById("catalogo-completo");
                           if (el) el.scrollIntoView({ behavior: "smooth" });
                         }}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-purple-600/80 hover:bg-purple-600 border border-purple-500/40 transition-all active:scale-95 cursor-pointer shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-primary/90 hover:bg-primary border border-primary/40 transition-all active:scale-95 cursor-pointer shadow-sm"
                       >
                         <span>Explorar Catálogo</span>
                         <ArrowRight size={12} />
@@ -217,10 +217,10 @@ const Header = memo(({ onSearch, onOpenCart, onCheckout, onCategoryChange, activ
                       {/* Header */}
                       <div className="flex items-center justify-between pb-3 border-b border-white/10">
                         <div className="flex items-center gap-1.5">
-                          <ShoppingBag size={14} className="text-purple-400" />
+                          <ShoppingBag size={14} className="text-primary" />
                           <h4 className="text-xs font-display font-bold text-white tracking-wider">SEU CARRINHO</h4>
                         </div>
-                        <span className="text-[11px] font-mono font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full">
+                        <span className="text-[11px] font-mono font-semibold bg-primary/20 text-rose-300 border border-primary/30 px-2 py-0.5 rounded-full">
                           {totalItems} {totalItems === 1 ? "item" : "itens"}
                         </span>
                       </div>
@@ -240,7 +240,7 @@ const Header = memo(({ onSearch, onOpenCart, onCheckout, onCategoryChange, activ
                               className="w-10 h-14 object-cover rounded-lg flex-shrink-0 shadow-sm"
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs font-body font-bold text-white truncate group-hover:text-purple-300 transition-colors">
+                              <p className="text-xs font-body font-bold text-white truncate group-hover:text-primary transition-colors">
                                 {item.serie.titulo}
                               </p>
                               <p className="text-[11px] font-mono font-black text-emerald-400 mt-0.5">
@@ -279,7 +279,7 @@ const Header = memo(({ onSearch, onOpenCart, onCheckout, onCategoryChange, activ
                           <Button
                             size="sm"
                             onClick={() => { setCartHover(false); onCheckout?.(); }}
-                            className="flex-1 text-xs font-bold bg-gradient-to-r from-[#7B3FE4] via-[#6C2BD9] to-[#5B21B6] hover:brightness-110 text-white rounded-xl h-9 shadow-md"
+                            className="flex-1 text-xs font-bold bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:brightness-110 text-white rounded-xl h-9 shadow-md"
                           >
                             Finalizar Compra
                           </Button>

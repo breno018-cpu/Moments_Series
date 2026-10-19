@@ -42,7 +42,7 @@ export const SeriesCard = memo(({
           <span>TOP {idx + 1}</span>
         </div>
       ) : topSeller ? (
-        <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 bg-purple-600 text-white text-[10px] font-body font-bold px-2 py-0.5 rounded-md shadow-sm group-hover:scale-105 transition-transform">
+        <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 bg-primary text-white text-[10px] font-body font-bold px-2 py-0.5 rounded-md shadow-sm group-hover:scale-105 transition-transform">
           <Flame size={isMobile ? 9 : 11} /> TOP
         </div>
       ) : null}
@@ -63,7 +63,7 @@ export const SeriesCard = memo(({
       {/* Poster Image Container with hover zoom & glow */}
       <button
         onClick={() => onSelect(serie)}
-        className="relative w-full overflow-hidden rounded-2xl border border-white/10 transition-all duration-300 group-hover:scale-[1.03] group-hover:border-purple-500/60 shadow-md group-hover:shadow-[0_12px_36px_rgba(123,63,228,0.35)] block cursor-pointer"
+        className="relative w-full overflow-hidden rounded-2xl border border-white/10 transition-all duration-300 group-hover:scale-[1.03] group-hover:border-primary/70 shadow-md group-hover:shadow-[0_12px_36px_hsl(var(--primary)/0.35)] block cursor-pointer"
       >
         <img
           src={serie.capa_url}
@@ -73,11 +73,11 @@ export const SeriesCard = memo(({
           decoding="async"
         />
 
-        {/* Lightweight Pure CSS Hover Glow (Composited on GPU, zero JS overhead) */}
+        {/* Lightweight Pure CSS Hover Glow matching brand color */}
         <div
           className="absolute inset-0 pointer-events-none rounded-2xl z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           style={{
-            background: "radial-gradient(circle at 50% 35%, rgba(192, 132, 252, 0.28), rgba(245, 158, 11, 0.1), transparent 70%)",
+            background: "radial-gradient(circle at 50% 35%, hsl(var(--primary) / 0.3), rgba(245, 158, 11, 0.1), transparent 70%)",
             mixBlendMode: "screen",
           }}
         />
@@ -100,7 +100,7 @@ export const SeriesCard = memo(({
 
       {/* Always visible info + buttons below the card */}
       <div className="mt-2.5 px-0.5 space-y-1.5">
-        <p className="text-[13px] md:text-sm font-body font-bold text-foreground leading-snug line-clamp-2 min-h-[2.4em] group-hover:text-purple-300 transition-colors">
+        <p className="text-[13px] md:text-sm font-body font-bold text-foreground leading-snug line-clamp-2 min-h-[2.4em] group-hover:text-primary transition-colors">
           {serie.titulo}
         </p>
 
@@ -125,7 +125,7 @@ export const SeriesCard = memo(({
         <div className="flex items-center gap-1.5 pt-1">
           <button
             onClick={() => onBuy?.(serie)}
-            className="flex-1 min-w-0 flex items-center justify-center gap-1 px-2.5 h-8 sm:h-8.5 bg-gradient-to-r from-[#7B3FE4] via-[#6C2BD9] to-[#5B21B6] hover:brightness-110 text-white text-[11px] sm:text-xs font-bold rounded-xl shadow-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
+            className="flex-1 min-w-0 flex items-center justify-center gap-1 px-2.5 h-8 sm:h-8.5 bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:brightness-110 text-white text-[11px] sm:text-xs font-bold rounded-xl shadow-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
           >
             <Play size={11} fill="currentColor" />
             <span>Garantir</span>

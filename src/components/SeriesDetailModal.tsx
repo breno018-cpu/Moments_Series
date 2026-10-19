@@ -167,7 +167,7 @@ const SeriesDetailModal = ({ serie, onClose, onBuy }: SeriesDetailModalProps) =>
             {/* Reviews */}
             <div className="mb-4 md:mb-5">
               <div className="flex items-center gap-2 mb-2">
-                <MessageCircle size={12} className="text-purple-400" />
+                <MessageCircle size={12} className="text-primary" />
                 <span className="text-[10px] md:text-xs font-body font-bold text-foreground/80 uppercase tracking-wider">
                   Avaliações de Clientes Verificados
                 </span>
@@ -183,7 +183,7 @@ const SeriesDetailModal = ({ serie, onClose, onBuy }: SeriesDetailModalProps) =>
                   >
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 flex items-center justify-center text-[10px] font-bold">
+                        <div className="w-5 h-5 rounded-full bg-primary/20 text-rose-300 flex items-center justify-center text-[10px] font-bold">
                           {review.name[0]}
                         </div>
                         <span className="text-[11px] font-semibold text-zinc-200">{review.name}</span>
@@ -205,14 +205,14 @@ const SeriesDetailModal = ({ serie, onClose, onBuy }: SeriesDetailModalProps) =>
 
             {/* Purchase box */}
             <motion.div
-              className="p-4 md:p-5 rounded-2xl bg-gradient-to-r from-purple-950/40 via-zinc-900/80 to-zinc-900/90 border border-purple-500/30 shadow-xl"
+              className="p-4 md:p-5 rounded-2xl bg-gradient-to-r from-rose-950/40 via-zinc-900/80 to-zinc-900/90 border border-rose-500/30 shadow-xl"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-purple-300">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-rose-300">
                     Acesso Completo & Vitalício
                   </p>
                   <p className="text-xs text-zinc-400 mt-0.5">
@@ -234,7 +234,7 @@ const SeriesDetailModal = ({ serie, onClose, onBuy }: SeriesDetailModalProps) =>
                 <Button
                   onClick={() => onBuy(serie)}
                   size={isMobile ? "sm" : "default"}
-                  className="flex-1 bg-gradient-to-r from-[#7B3FE4] via-[#6C2BD9] to-[#5B21B6] hover:brightness-110 text-white font-bold rounded-xl h-12 shadow-lg transition-all text-xs sm:text-sm uppercase tracking-wide gap-2"
+                  className="flex-1 bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:brightness-110 text-white font-bold rounded-xl h-12 shadow-lg transition-all text-xs sm:text-sm uppercase tracking-wide gap-2"
                 >
                   <Play size={15} fill="currentColor" />
                   <span>Garantir Acesso Imediato</span>

@@ -153,7 +153,7 @@ export const FullCatalogSection: React.FC<FullCatalogSectionProps> = ({
           </p>
           <button
             onClick={() => setActiveGenre("todos")}
-            className="mt-3 text-xs text-purple-400 hover:underline font-bold cursor-pointer"
+            className="mt-3 text-xs text-primary hover:underline font-bold cursor-pointer"
           >
             Ver Todas as Séries
           </button>

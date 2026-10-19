@@ -382,7 +382,7 @@ const Index = () => {
             <button onClick={() => setFooterModal("termos")} className="hover:text-foreground/50 transition-colors duration-300">Termos</button>
             <button onClick={() => setFooterModal("privacidade")} className="hover:text-foreground/50 transition-colors duration-300">Privacidade</button>
             <button onClick={() => setFooterModal("faq")} className="hover:text-foreground/50 transition-colors duration-300">FAQ</button>
-            <button onClick={() => navigate("/admin")} className="hover:text-purple-400 text-muted-foreground/45 transition-colors duration-300">Admin</button>
+            <button onClick={() => navigate("/admin")} className="hover:text-primary text-muted-foreground/45 transition-colors duration-300">Admin</button>
           </div>
         </div>
         <p className="text-center text-[9px] md:text-[10px] font-body text-muted-foreground/25 mt-4 md:mt-6">© 2026 Hangar ❤️ Box. Todos os direitos reservados.</p>
