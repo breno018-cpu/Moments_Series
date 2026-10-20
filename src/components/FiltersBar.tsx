@@ -130,7 +130,7 @@ const FiltersBar = ({ allSeries, filters, onChange }: FiltersBarProps) => {
 
   const pillItems = [
     { id: "todos", label: "Todos", count: counts.todos, icon: null },
-    { id: "maisVendidos", label: "Mais Vendidos", count: counts.maisVendidos, icon: Flame },
+    { id: "maisVendidos", label: "Mais Popular", count: counts.maisVendidos, icon: Flame },
     { id: "lancamentos", label: "Lançamentos", count: counts.lancamentos, icon: Zap },
     { id: "dublados", label: "Dublados", count: counts.dublados, icon: Mic },
     { id: "legendados", label: "Legendados", count: counts.legendados, icon: MessageSquare },

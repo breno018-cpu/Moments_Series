@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { PLATFORM_LIMITS, validateImageUpload } from "@/lib/limits";
+import { stripEmojis } from "@/lib/utils";
 
 export interface DbSerie {
   id: string;
@@ -87,7 +88,13 @@ export async function fetchActiveSeries(): Promise<DbSerie[]> {
     .eq("status", "ativo")
     .order("posicao", { ascending: true });
   if (error) throw error;
-  return ((data as any[]) || []).map((row) => ({ ...row, link_acesso: "", stream_url: null })) as DbSerie[];
+  return ((data as any[]) || []).map((row) => ({
+    ...row,
+    titulo: stripEmojis(row.titulo),
+    resumo: stripEmojis(row.resumo),
+    link_acesso: "",
+    stream_url: null,
+  })) as DbSerie[];
 }
 
 export async function fetchSeriesAccessLinks(
@@ -116,13 +123,23 @@ export async function createSerie(serie: Omit<DbSerie, "id" | "created_at" | "up
       `Limite máximo de catálogo atingido (${PLATFORM_LIMITS.SERIES_MAX} títulos). Exclua ou arquive um título existente antes de cadastrar novos.`
     );
   }
-  const { data, error } = await supabase.from("series").insert(serie as any).select().single();
+  const payload = {
+    ...serie,
+    titulo: stripEmojis(serie.titulo),
+    resumo: stripEmojis(serie.resumo),
+  };
+  const { data, error } = await supabase.from("series").insert(payload as any).select().single();
   if (error) throw error;
   return data as unknown as DbSerie;
 }
 
 export async function updateSerie(id: string, updates: Partial<DbSerie>): Promise<DbSerie> {
-  const { data, error } = await supabase.from("series").update(updates as any).eq("id", id).select().single();
+  const payload = {
+    ...updates,
+    ...(updates.titulo !== undefined ? { titulo: stripEmojis(updates.titulo) } : {}),
+    ...(updates.resumo !== undefined ? { resumo: stripEmojis(updates.resumo) } : {}),
+  };
+  const { data, error } = await supabase.from("series").update(payload as any).eq("id", id).select().single();
   if (error) throw error;
   return data as unknown as DbSerie;
 }
@@ -445,7 +462,10 @@ export async function fetchCarouselSections(): Promise<DbCarouselSection[]> {
 export async function fetchVisibleCarouselSections(): Promise<DbCarouselSection[]> {
   const { data, error } = await supabase.from("carousel_sections").select("*").eq("is_visible", true).order("posicao", { ascending: true });
   if (error) throw error;
-  return (data as unknown as DbCarouselSection[]) || [];
+  return ((data as unknown as DbCarouselSection[]) || []).map((s) => ({
+    ...s,
+    title: stripEmojis(s.title),
+  }));
 }
 
 export async function createCarouselSection(section: Omit<DbCarouselSection, "id" | "created_at" | "updated_at">): Promise<DbCarouselSection> {
@@ -504,7 +524,8 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
 export async function fetchNavTabs(): Promise<NavTab[]> {
   const { data, error } = await supabase.from("site_settings").select("value").eq("key", "nav_tabs").maybeSingle();
   if (error || !data) return DEFAULT_NAV_TABS;
-  return (data.value as unknown as NavTab[]) || DEFAULT_NAV_TABS;
+  const tabs = (data.value as unknown as NavTab[]) || DEFAULT_NAV_TABS;
+  return tabs.map((t) => ({ ...t, label: stripEmojis(t.label) }));
 }
 
 export async function saveNavTabs(tabs: NavTab[]): Promise<void> {
@@ -601,17 +622,31 @@ export async function fetchPacks(): Promise<DbPack[]> {
 export async function fetchActivePacks(): Promise<DbPack[]> {
   const { data, error } = await supabase.from("packs").select("*").eq("is_active", true).order("posicao", { ascending: true });
   if (error) throw error;
-  return (data as unknown as DbPack[]) || [];
+  return ((data as unknown as DbPack[]) || []).map((p) => ({
+    ...p,
+    titulo: stripEmojis(p.titulo),
+    descricao: stripEmojis(p.descricao),
+  }));
 }
 
 export async function createPack(pack: Omit<DbPack, "id" | "created_at" | "updated_at">): Promise<DbPack> {
-  const { data, error } = await supabase.from("packs").insert(pack as any).select().single();
+  const payload = {
+    ...pack,
+    titulo: stripEmojis(pack.titulo),
+    descricao: stripEmojis(pack.descricao),
+  };
+  const { data, error } = await supabase.from("packs").insert(payload as any).select().single();
   if (error) throw error;
   return data as unknown as DbPack;
 }
 
 export async function updatePack(id: string, updates: Partial<DbPack>): Promise<DbPack> {
-  const { data, error } = await supabase.from("packs").update(updates as any).eq("id", id).select().single();
+  const payload = {
+    ...updates,
+    ...(updates.titulo !== undefined ? { titulo: stripEmojis(updates.titulo) } : {}),
+    ...(updates.descricao !== undefined ? { descricao: stripEmojis(updates.descricao) } : {}),
+  };
+  const { data, error } = await supabase.from("packs").update(payload as any).eq("id", id).select().single();
   if (error) throw error;
   return data as unknown as DbPack;
 }

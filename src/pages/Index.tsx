@@ -18,14 +18,25 @@ import FooterModal from "@/components/FooterModal";
 import { seriesData, Serie } from "@/data/series";
 import { useCart } from "@/contexts/CartContext";
 import { trackSearch } from "@/lib/metaPixel";
+import { stripEmojis } from "@/lib/utils";
 import { type DbCoupon, type NavTab, DEFAULT_NAV_TABS, fetchVisibleCarouselSections, fetchNavTabs, fetchActiveSeries, type DbCarouselSection, type DbSerie } from "@/lib/api";
 
 const dbSerieToSerie = (db: DbSerie): Serie => ({
-  id: db.id, titulo: db.titulo, resumo: db.resumo, capa_url: db.capa_url,
-  fundo_url: db.fundo_url, categoria: db.categoria, vendas_count: db.vendas_count,
-  data_adicao: db.data_adicao, is_hero: db.is_hero, preco: Number(db.preco),
-  rating: Number(db.rating), elenco: db.elenco, temporadas: db.temporadas,
-  status: db.status as "ativo" | "inativo", posicao: db.posicao,
+  id: db.id,
+  titulo: stripEmojis(db.titulo),
+  resumo: stripEmojis(db.resumo),
+  capa_url: db.capa_url,
+  fundo_url: db.fundo_url,
+  categoria: db.categoria,
+  vendas_count: db.vendas_count,
+  data_adicao: db.data_adicao,
+  is_hero: db.is_hero,
+  preco: Number(db.preco),
+  rating: Number(db.rating),
+  elenco: db.elenco,
+  temporadas: db.temporadas,
+  status: db.status as "ativo" | "inativo",
+  posicao: db.posicao,
   is_adult: db.is_adult,
 });
 

@@ -136,7 +136,7 @@ const SeriesDetailModal = ({ serie, onClose, onBuy }: SeriesDetailModalProps) =>
             <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4 flex-wrap">
               {topSeller && (
                 <span className="flex items-center gap-1 text-[10px] md:text-xs font-body font-semibold text-primary bg-primary/10 px-2 md:px-3 py-1 md:py-1.5 rounded-full">
-                  <Flame size={11} /> Mais vendido
+                  <Flame size={11} /> Mais Popular
                 </span>
               )}
               <span className="flex items-center gap-1 text-[10px] md:text-xs font-body text-accent">
@@ -237,7 +237,7 @@ const SeriesDetailModal = ({ serie, onClose, onBuy }: SeriesDetailModalProps) =>
                   className="flex-1 bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:brightness-110 text-white font-bold rounded-xl h-12 shadow-lg transition-all text-xs sm:text-sm uppercase tracking-wide gap-2"
                 >
                   <Play size={15} fill="currentColor" />
-                  <span>Garantir Acesso Imediato</span>
+                  <span>Garantir Acesso</span>
                 </Button>
 
                 <Button

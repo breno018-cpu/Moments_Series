@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Package, ShoppingCart, Star, Tag, Heart } from "lucide-react";
+import { Package, ShoppingCart, Star, Tag, Heart, Flame } from "lucide-react";
 import Header from "@/components/Header";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 import CheckoutModal from "@/components/CheckoutModal";
@@ -10,13 +10,25 @@ import CartPage from "@/components/CartPage";
 import { fetchActivePacks, fetchActiveSeries, type DbPack, type DbSerie, type DbCoupon } from "@/lib/api";
 import { Serie } from "@/data/series";
 import { Button } from "@/components/ui/button";
+import { stripEmojis } from "@/lib/utils";
 
 const dbSerieToSerie = (db: DbSerie): Serie => ({
-  id: db.id, titulo: db.titulo, resumo: db.resumo, capa_url: db.capa_url,
-  fundo_url: db.fundo_url, categoria: db.categoria, vendas_count: db.vendas_count,
-  data_adicao: db.data_adicao, is_hero: db.is_hero, preco: Number(db.preco),
-  rating: Number(db.rating), elenco: db.elenco, temporadas: db.temporadas,
-  status: db.status as "ativo" | "inativo", posicao: db.posicao, is_adult: db.is_adult,
+  id: db.id,
+  titulo: stripEmojis(db.titulo),
+  resumo: stripEmojis(db.resumo),
+  capa_url: db.capa_url,
+  fundo_url: db.fundo_url,
+  categoria: db.categoria,
+  vendas_count: db.vendas_count,
+  data_adicao: db.data_adicao,
+  is_hero: db.is_hero,
+  preco: Number(db.preco),
+  rating: Number(db.rating),
+  elenco: db.elenco,
+  temporadas: db.temporadas,
+  status: db.status as "ativo" | "inativo",
+  posicao: db.posicao,
+  is_adult: db.is_adult,
 });
 
 const PacksPage = () => {
@@ -138,8 +150,13 @@ const PacksPage = () => {
                           <Package size={44} className="text-primary/40" />
                         </div>
                       )}
+                      {pack.posicao === 1 && (
+                        <div className="absolute top-3 left-3 z-10 flex items-center gap-1 bg-[#F59E0B] text-zinc-950 font-display font-black text-[10px] px-2.5 py-0.5 rounded-md shadow-md uppercase tracking-wider">
+                          <Flame size={11} className="fill-current text-zinc-950" /> Mais Popular
+                        </div>
+                      )}
                       {discount > 0 && (
-                        <div className="absolute top-3 right-3 px-3 py-1 bg-primary text-primary-foreground text-[11px] font-body font-bold rounded-full shadow-lg">
+                        <div className="absolute top-3 right-3 z-10 px-3 py-1 bg-primary text-primary-foreground text-[11px] font-body font-bold rounded-full shadow-lg">
                           -{discount}%
                         </div>
                       )}
@@ -189,10 +206,10 @@ const PacksPage = () => {
 
                       <Button
                         onClick={() => handleBuyPack(pack)}
-                        className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-body font-semibold rounded-full"
+                        className="w-full h-11 bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:brightness-110 text-white font-bold rounded-xl text-xs sm:text-sm uppercase tracking-wide gap-2 cursor-pointer shadow-md"
                       >
                         <ShoppingCart size={16} />
-                        Garantir plano
+                        Garantir Acesso
                       </Button>
                     </div>
                   </div>

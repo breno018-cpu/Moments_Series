@@ -43,7 +43,7 @@ export const SeriesCard = memo(({
         </div>
       ) : topSeller ? (
         <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1 bg-primary text-white text-[10px] font-body font-bold px-2 py-0.5 rounded-md shadow-sm group-hover:scale-105 transition-transform">
-          <Flame size={isMobile ? 9 : 11} /> TOP
+          <Flame size={isMobile ? 9 : 11} /> Mais Popular
         </div>
       ) : null}
 
@@ -128,7 +128,7 @@ export const SeriesCard = memo(({
             className="flex-1 min-w-0 flex items-center justify-center gap-1 px-2.5 h-8 sm:h-8.5 bg-gradient-to-r from-red-600 via-rose-600 to-rose-700 hover:brightness-110 text-white text-[11px] sm:text-xs font-bold rounded-xl shadow-xs transition-all hover:scale-[1.03] active:scale-[0.97] cursor-pointer"
           >
             <Play size={11} fill="currentColor" />
-            <span>Garantir</span>
+            <span>Garantir Acesso</span>
           </button>
 
           <button
@@ -190,7 +190,7 @@ const SeriesListItem = memo(({
         )}
         {topSeller && (
           <div className="absolute top-0 left-0 flex items-center gap-0.5 bg-accent text-accent-foreground text-[9px] font-body font-bold px-2 py-0.5 rounded-br-lg rounded-tl-lg">
-            <Flame size={9} /> TOP
+            <Flame size={9} /> Mais Popular
           </div>
         )}
       </button>
@@ -208,7 +208,7 @@ const SeriesListItem = memo(({
             onClick={() => onBuy?.(serie)}
             className="ml-auto flex items-center justify-center gap-1 px-3.5 h-8 bg-primary text-primary-foreground text-[11px] md:text-xs font-body font-bold rounded-full hover:bg-primary/85 transition-colors"
           >
-            <Play size={11} fill="currentColor" /> Garantir
+            <Play size={11} fill="currentColor" /> Garantir Acesso
           </button>
           <button
             onClick={() => { if (!inCart) addToCart(serie); }}
