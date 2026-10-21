@@ -1,1 +1,0 @@
-ALTER TABLE public.carousel_sections ADD COLUMN IF NOT EXISTS layout_mode text NOT NULL DEFAULT 'vertical';

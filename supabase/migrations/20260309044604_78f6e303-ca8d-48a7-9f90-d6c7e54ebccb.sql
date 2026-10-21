@@ -1,1 +1,0 @@
-ALTER TABLE public.series ADD COLUMN IF NOT EXISTS link_acesso TEXT DEFAULT '';

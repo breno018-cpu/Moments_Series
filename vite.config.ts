@@ -3,13 +3,16 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig(() => ({
+export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    allowedHosts: true,
-    hmr: {
-      overlay: false,
+    proxy: {
+      "/api/whatsapp-gateway": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/whatsapp-gateway/, ""),
+      },
     },
   },
   plugins: [react()],
@@ -19,24 +22,14 @@ export default defineConfig(() => ({
     },
   },
   build: {
-    target: ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
-          "vendor-react": ["react", "react-dom", "react/jsx-runtime", "react-router-dom"],
-          "vendor-supabase": ["@supabase/supabase-js", "@tanstack/react-query"],
-          "vendor-motion": ["framer-motion", "gsap", "@gsap/react"],
-          "vendor-charts": ["recharts"],
-          "vendor-ui": [
-            "@radix-ui/react-dialog",
-            "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-tabs",
-            "@radix-ui/react-select",
-            "@radix-ui/react-popover",
-            "@radix-ui/react-tooltip",
-            "lucide-react",
-          ],
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-ui': ['lucide-react', 'clsx', 'tailwind-merge'],
         },
       },
     },

@@ -1,221 +1,176 @@
-import { useState, useEffect, useCallback, useRef, memo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Info, Star, Check } from "lucide-react";
-import { Serie } from "@/data/series";
-import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useEffect, useState, useMemo } from "react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { Button } from "./ui/button";
+import { useSeries } from "@/hooks/useSeries";
+import placeholderImage from "@/assets/series-1.jpg";
+import { optimizedImage } from "@/lib/image";
+
+import { Series } from "@/hooks/useSeries";
+import { SeriesDetailModal } from "@/components/SeriesDetailModal";
 
 interface HeroCarouselProps {
-  series: Serie[];
-  onDetails: (serie: Serie) => void;
-  onBuy: (serie: Serie) => void;
+  items: Series[];
 }
 
-const INTERVAL = 4500;
-
-const contentVariants = {
-  enter: { opacity: 0, y: 30 },
-  center: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const, staggerChildren: 0.08 } },
-  exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
-};
-
-const childVariants = {
-  enter: { opacity: 0, y: 15 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -10 },
-};
-
-const HeroCarousel = memo(({ series, onDetails, onBuy }: HeroCarouselProps) => {
-  const [current, setCurrent] = useState(0);
-  const [progressKey, setProgressKey] = useState(0);
-  const isTransitioning = useRef(false);
-  const isMobile = useIsMobile();
-  const touchStart = useRef<number>(0);
-
-  const goTo = useCallback((index: number) => {
-    if (isTransitioning.current) return;
-    isTransitioning.current = true;
-    setCurrent(index);
-    setProgressKey((k) => k + 1);
-    setTimeout(() => { isTransitioning.current = false; }, 700);
-  }, []);
-
-  const nextSlide = useCallback(() => goTo((current + 1) % series.length), [current, series.length, goTo]);
-  const prevSlide = useCallback(() => goTo((current - 1 + series.length) % series.length), [current, series.length, goTo]);
-
-  useEffect(() => { setCurrent(0); }, [series]);
+export const HeroCarousel = ({ items }: HeroCarouselProps) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
+  const [imgError, setImgError] = useState<Record<string, boolean>>({});
+  const featuredSeries = items;
 
   useEffect(() => {
-    if (series.length <= 1) return;
-    const timer = setTimeout(nextSlide, INTERVAL);
-    return () => clearTimeout(timer);
-  }, [current, nextSlide, series.length]);
+    setCurrentSlide(0);
+  }, [items]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStart.current = e.touches[0].clientX;
-  }, []);
+  useEffect(() => {
+    if (featuredSeries.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % featuredSeries.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [featuredSeries.length]);
 
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    const diff = touchStart.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
-      diff > 0 ? nextSlide() : prevSlide();
-    }
-  }, [nextSlide, prevSlide]);
+  const nextIdx = (currentSlide + 1) % (featuredSeries.length || 1);
+  const nextSlide = () =>
+    setCurrentSlide((prev) => (prev + 1) % featuredSeries.length);
+  const prevSlide = () =>
+    setCurrentSlide((prev) => (prev - 1 + featuredSeries.length) % featuredSeries.length);
 
-  if (series.length === 0) return null;
-  const safeCurrent = current >= series.length ? 0 : current;
-  const s = series[safeCurrent];
+  if (!featuredSeries.length) return null;
+
+  const series = featuredSeries[currentSlide] || featuredSeries[0];
+  if (!series) return null;
+
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const imageSrc = imgError[series.id]
+    ? placeholderImage
+    : optimizedImage(series.image_url, {
+        width: isMobile ? 800 : 1400,
+        quality: isMobile ? 65 : 75,
+      });
 
   return (
-    <div
-      className="relative h-[86svh] md:h-[94vh] min-h-[520px] md:min-h-[620px] w-full overflow-hidden"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* Background images with crossfade */}
-      <AnimatePresence mode="popLayout">
-        <motion.div
-          key={s.id}
-          className="absolute inset-0"
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-        >
-          <img src={s.fundo_url} alt="" className="w-full h-full object-cover" loading="eager" decoding="async" />
-        </motion.div>
-      </AnimatePresence>
+    <div className="relative h-[56vh] sm:h-[66vh] min-h-[420px] max-h-[640px] overflow-hidden bg-background">
+      <div key={series.id} className="absolute inset-0 animate-in fade-in duration-300">
+        <img
+          src={imageSrc}
+          alt={series.title}
+          onError={() => setImgError((p) => ({ ...p, [series.id]: true }))}
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover object-center select-none"
+        />
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/50" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent max-w-4xl" />
-      <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-background/90 to-transparent" />
+        {/* Sem névoa — apenas base inferior sólida para legibilidade do texto */}
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background/40 to-transparent pointer-events-none" />
 
-      {/* Content — Left aligned with unified container max-w-[1440px] */}
-      <div className="absolute inset-0 z-10 flex items-end pb-12 sm:pb-16 md:pb-20">
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-10 lg:px-12">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={s.id}
-              className="max-w-3xl flex flex-col items-start text-left"
-              variants={contentVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-            >
-              {/* Title */}
-              <motion.h1
-                variants={childVariants}
-                className="text-2xl sm:text-4xl md:text-5xl lg:text-[54px] font-display font-black text-white uppercase tracking-tight leading-[1.08] line-clamp-2 md:line-clamp-3"
-                style={{ textShadow: "0 4px 20px rgba(0,0,0,0.8)" }}
-              >
-                {s.titulo}
-              </motion.h1>
+        {/* Conteúdo — minimalista, hierarquia tipográfica clara */}
+        <div className="relative h-full app-container flex items-end pb-12 sm:pb-20">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-3 mb-4 text-[10px] sm:text-xs uppercase tracking-[0.25em] text-purple-400 font-bold">
+              <span className="bg-purple-500/20 border border-purple-500/30 px-2 py-0.5 rounded">DESTAQUE PREMIUM</span>
+              {series.genre && (
+                <>
+                  <span className="h-px w-6 bg-purple-500/40" />
+                  <span className="text-slate-300">{series.genre}</span>
+                </>
+              )}
+            </div>
 
-              {/* Badges line: Star rating, Year, Dublado/Audio, Full Episodes */}
-              <motion.div
-                variants={childVariants}
-                className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 sm:mt-4 text-xs sm:text-sm font-body font-semibold"
-              >
-                <div className="flex items-center gap-1 text-amber-400">
-                  <Star size={14} className="fill-amber-400 text-amber-400" />
-                  <span className="font-bold">{s.rating ? Number(s.rating).toFixed(1) : "5.0"}</span>
-                </div>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black mb-4 text-white leading-[1.05] tracking-tight drop-shadow-md">
+              {series.title}
+            </h1>
 
-                <span className="text-zinc-300 font-medium">2026</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-4 text-xs sm:text-sm text-slate-300">
+              <span className="flex items-center gap-1.5 font-bold text-yellow-400">
+                <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                {series.rating > 0 ? series.rating.toFixed(1) : "4.9"}
+              </span>
+              <span>{series.year || 2024}</span>
+              <span className="uppercase tracking-[0.16em] text-[10px] font-bold px-2 py-0.5 rounded bg-white/10 text-white">
+                {series.audio_type === "dublado" ? "Dublado" : "Legendado"}
+              </span>
+              <span className="text-emerald-400 font-semibold text-xs flex items-center gap-1">
+                ✓ Episódios Completos
+              </span>
+            </div>
 
-                <span className="bg-black/60 border border-white/20 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider">
-                  DUBLADO
+            <p className="text-xs sm:text-sm text-slate-300 mb-6 line-clamp-2 max-w-xl leading-relaxed">
+              {series.description || "Acesso vitalício aos episódios completos em alta resolução. Assista agora no seu smartphone, tablet, smart TV ou computador."}
+            </p>
+
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight">
+                  R$ {series.price.toFixed(2)}
                 </span>
-
-                <span className="text-emerald-400 flex items-center gap-1 font-bold text-xs sm:text-sm">
-                  <Check size={14} className="text-emerald-400 stroke-[3]" /> Episódios Completos
+                <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-semibold hidden sm:inline">
+                  Acesso Vitalício
                 </span>
-              </motion.div>
-
-              {/* Synopsis / description */}
-              <motion.p
-                variants={childVariants}
-                className="mt-3 text-xs sm:text-sm md:text-base text-zinc-300 font-body max-w-2xl line-clamp-2 leading-relaxed"
-                style={{ textShadow: "0 2px 10px rgba(0,0,0,0.7)" }}
+              </div>
+              <Button
+                onClick={() => setSelectedSeries(series)}
+                className="h-11 px-6 text-xs font-black uppercase tracking-wider rounded-xl bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-slate-950 hover:from-yellow-400 hover:to-amber-300 shadow-xl shadow-yellow-500/20 border border-yellow-300/40 transition-all hover:scale-105"
               >
-                {s.resumo || "Acesso vitalício aos episódios completos em alta resolução. Assista agora no seu smartphone, tablet, smart TV ou computador."}
-              </motion.p>
-
-              {/* Price & CTA Row */}
-              <motion.div
-                variants={childVariants}
-                className="flex flex-wrap items-center gap-3 sm:gap-5 mt-5 sm:mt-6"
-              >
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono tracking-tight">
-                    R$ {Number(s.preco || 6).toFixed(2)}
-                  </span>
-                  <span className="text-[10px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                    ACESSO VITALÍCIO
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <Button
-                    onClick={() => onBuy(s)}
-                    className="bg-[#F59E0B] hover:bg-[#D97706] text-zinc-950 font-display font-black text-xs sm:text-sm uppercase tracking-wider px-6 sm:px-8 h-11 sm:h-12 rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    GARANTIR ACESSO
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    onClick={() => onDetails(s)}
-                    className="border-white/20 bg-black/40 hover:bg-black/60 text-white font-body font-semibold text-xs sm:text-sm px-4 sm:px-5 h-11 sm:h-12 rounded-xl backdrop-blur-md transition-all gap-1.5"
-                  >
-                    <Info size={15} />
-                    <span>Detalhes</span>
-                  </Button>
-                </div>
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
+                Garantir Acesso
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Nav arrows on sides */}
-      <button
+      {featuredSeries[nextIdx] && (
+        <link rel="preload" as="image" href={optimizedImage(featuredSeries[nextIdx].image_url, { width: 1600, quality: 80 })} />
+      )}
+
+      {/* Setas minimalistas */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 bg-background/30 hover:bg-background/60 backdrop-blur-sm h-10 w-10 rounded-full z-10 border border-foreground/15"
         onClick={prevSlide}
-        aria-label="Slide anterior"
-        className="absolute left-3 sm:left-6 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-11 md:h-11 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 backdrop-blur-md flex items-center justify-center text-white/80 hover:text-white transition-all z-20 shadow-xl"
+        aria-label="Anterior"
       >
-        <ChevronLeft size={20} />
-      </button>
-
-      <button
+        <ChevronLeft className="w-4 h-4" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 bg-background/30 hover:bg-background/60 backdrop-blur-sm h-10 w-10 rounded-full z-10 border border-foreground/15"
         onClick={nextSlide}
-        aria-label="Próximo slide"
-        className="absolute right-3 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-11 md:h-11 rounded-full bg-black/50 hover:bg-black/80 border border-white/10 backdrop-blur-md flex items-center justify-center text-white/80 hover:text-white transition-all z-20 shadow-xl"
+        aria-label="Próximo"
       >
-        <ChevronRight size={20} />
-      </button>
+        <ChevronRight className="w-4 h-4" />
+      </Button>
 
-      {/* Slide indicators - centered horizontal dashes */}
-      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-        {series.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            aria-label={`Ir para slide ${i + 1}`}
-            className="h-1 rounded-full transition-all duration-300"
-            style={{
-              width: i === current ? "32px" : "16px",
-              backgroundColor: i === current ? "#ffffff" : "rgba(255,255,255,0.3)",
-            }}
-          />
-        ))}
+      {/* Indicadores — perfeitamente centralizados */}
+      <div className="absolute bottom-4 sm:bottom-6 inset-x-0 flex justify-center items-center gap-2 z-10 pointer-events-none">
+        <div className="flex items-center gap-2 pointer-events-auto px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-xs">
+          {featuredSeries.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-0.5 rounded-full transition-all duration-500 cursor-pointer ${
+                index === currentSlide
+                  ? "w-10 sm:w-12 bg-white shadow-sm"
+                  : "w-5 sm:w-6 bg-white/30 hover:bg-white/60"
+              }`}
+              aria-label={`Slide ${index + 1}`}
+            />
+          ))}
+        </div>
       </div>
+
+      {selectedSeries && (
+        <SeriesDetailModal
+          series={selectedSeries}
+          isOpen={!!selectedSeries}
+          onClose={() => setSelectedSeries(null)}
+        />
+      )}
     </div>
   );
-});
-
-
-HeroCarousel.displayName = "HeroCarousel";
+};
 
 export default HeroCarousel;

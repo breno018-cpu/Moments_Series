@@ -1,7 +1,22 @@
-project_id = "lmaotaqkaczqfkpsxxbw"
+project_id = "pzgqgznbesvxkbnmsjeu"
 
-[functions]
-  [functions.auth-email-hook]
-    verify_jwt = false
-  [functions.toggle-maintenance]
-    verify_jwt = false
+[functions.process-payment]
+verify_jwt = false
+
+[functions.payment-webhook]
+verify_jwt = false
+
+[functions.create-pix-payment]
+verify_jwt = false
+
+[functions.pix-webhook]
+verify_jwt = false
+
+[functions.check-payment-status]
+verify_jwt = false
+
+[functions.recover-abandoned-cart]
+verify_jwt = false
+
+[functions.toggle-maintenance]
+verify_jwt = false

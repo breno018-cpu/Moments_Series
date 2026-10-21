@@ -1,0 +1,60 @@
+{
+  "id": "com.momentsseries.app",
+  "name": "Moments Séries - Plataforma Premium",
+  "short_name": "Moments Séries",
+  "description": "Assista e tenha acesso vitalício às melhores séries e animes dublados e legendados em alta qualidade.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#07080c",
+  "theme_color": "#07080c",
+  "orientation": "any",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["entertainment", "video", "movies"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catálogo de Séries",
+      "short_name": "Séries",
+      "description": "Explorar lançamentos e séries completas",
+      "url": "/?source=taskbar_series",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Catálogo de Animes",
+      "short_name": "Animes",
+      "description": "Assistir animes dublados e legendados",
+      "url": "/animes?source=taskbar_animes",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Minha Lista (Favoritos)",
+      "short_name": "Favoritos",
+      "description": "Abrir minha lista de títulos salvos",
+      "url": "/favoritos?source=taskbar_favoritos",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    }
+  ],
+  "handle_links": "preferred"
+}
