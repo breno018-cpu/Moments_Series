@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutSchema, type CheckoutFormData } from "@/lib/validators";
-import { Loader2, CreditCard, ShoppingCart, Tag, X } from "lucide-react";
+import { Loader2, CreditCard, ShoppingCart, Tag, X, Zap } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { useValidateCoupon } from "@/hooks/useCoupons";
 import { trackPixel } from "@/hooks/useMetaPixel";
