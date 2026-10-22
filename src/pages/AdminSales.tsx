@@ -234,7 +234,7 @@ export default function AdminSales({ embedded = false }: AdminSalesProps = {}) {
   }, [sales, periodFilter]);
 
   const filteredSales = useMemo(() => {
-    let result = periodScopedSales.filter(s => {
+    const result = periodScopedSales.filter(s => {
       const q = search.toLowerCase();
       const matchesSearch = !q || 
         s.customer_name.toLowerCase().includes(q) ||
