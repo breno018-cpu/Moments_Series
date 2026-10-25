@@ -221,29 +221,40 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="app-container py-12 sm:py-20 max-w-4xl mx-auto overflow-x-hidden">
-        {/* Barra Superior */}
-        <div className="flex items-center justify-between mb-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(-1)} 
-            className="h-9 px-3 gap-1.5 text-slate-400 hover:text-white hover:bg-white/[0.05] rounded-xl text-xs font-semibold"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar ao catálogo
-          </Button>
+    <div className="min-h-screen bg-[#07080d] text-white selection:bg-emerald-500/20">
+      {/* Header Minimalista Exclusivo de Checkout (Estilo Stripe / Netflix) */}
+      <header className="sticky top-0 z-40 w-full bg-[#07080d]/80 backdrop-blur-xl border-b border-white/[0.06]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}
+              className="h-9 w-9 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06]"
+              title="Voltar"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <span className="text-base sm:text-lg font-black tracking-tight text-white group-hover:text-emerald-400 transition-colors">
+              MOMENTS
+            </span>
+          </Link>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 text-xs font-medium">
+          <div className="flex items-center gap-2 text-xs font-medium text-slate-400 bg-white/[0.03] border border-white/[0.08] px-3 py-1.5 rounded-full">
             <Lock className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Checkout Seguro</span>
+            <span className="hidden sm:inline">Ambiente Criptografado & Seguro</span>
+            <span className="sm:hidden">Checkout Seguro</span>
           </div>
         </div>
+      </header>
 
-        {/* Resumo Rápido para Mobile (visível apenas em telas menores que md) */}
-        <div className="md:hidden mb-5 p-3.5 bg-[#12131d] border border-white/10 rounded-2xl flex items-center justify-between gap-3 shadow-lg">
-          <div className="flex items-center gap-3 min-w-0">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-12 overflow-x-hidden">
+        {/* Banner de Resumo Mobile (Estilo Netflix) */}
+        <div className="md:hidden mb-6 p-4 rounded-2xl bg-[#0f1018] border border-white/[0.08] flex items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-center gap-3.5 min-w-0">
             <img
               src={imgSrc || series.image_url}
               alt={series.title}
@@ -251,40 +262,41 @@ export default function Checkout() {
               className="w-12 h-16 object-cover rounded-xl shadow-md shrink-0 ring-1 ring-white/10"
             />
             <div className="min-w-0">
-              <h2 className="font-bold text-sm text-white truncate">{series.title}</h2>
-              <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1 mt-0.5">
-                <ShieldCheck className="w-3 h-3" /> Acesso Vitalício • 4K
+              <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-0.5">
+                Acesso Vitalício
               </span>
+              <h2 className="font-bold text-sm text-white truncate">{series.title}</h2>
+              <p className="text-[11px] text-slate-400 truncate">{series.genre || 'Produção Exclusiva'}</p>
             </div>
           </div>
 
           <div className="text-right shrink-0">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Total</span>
-            <span className="text-xl font-extrabold text-emerald-400">
+            <span className="text-[10px] text-slate-500 uppercase font-semibold block">Total</span>
+            <span className="text-xl font-black text-white">
               R$ {total.toFixed(2).replace('.', ',')}
             </span>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-12 gap-8 items-start">
+        <div className="grid md:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Formulário de Pagamento (7 colunas no desktop) */}
-          <div className="md:col-span-7 bg-[#12131d] border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xl space-y-5">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Dados para Acesso</h2>
-              <p className="text-xs text-slate-400 mt-1">Informe onde você receberá seu link e comprovante.</p>
+          <div className="md:col-span-7 bg-[#0f1018] border border-white/[0.08] rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl">
+            <div className="mb-6">
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">Finalizar Pedido</h1>
+              <p className="text-xs sm:text-sm text-slate-400 mt-1">Preencha seus dados para receber o acesso imediatamente.</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <Label htmlFor="name" className="text-xs font-semibold text-slate-200">Nome Completo</Label>
-                <div className="relative mt-1.5">
+                <Label htmlFor="name" className="text-xs font-semibold text-slate-300 block mb-1.5">Nome Completo</Label>
+                <div className="relative">
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                   <Input
                     id="name"
                     {...register('name')}
-                    placeholder="Seu nome completo"
+                    placeholder="Nome e sobrenome"
                     disabled={isProcessing}
-                    className="pl-10 h-11 bg-white/[0.03] border-white/10 rounded-xl focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30 text-white placeholder:text-slate-500"
+                    className="pl-10 h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-emerald-500 focus:bg-white/[0.05] focus:ring-1 focus:ring-emerald-500/30 text-white placeholder:text-slate-500 text-sm"
                   />
                 </div>
                 {errors.name && (
@@ -293,8 +305,8 @@ export default function Checkout() {
               </div>
 
               <div>
-                <Label htmlFor="email" className="text-xs font-semibold text-slate-200">E-mail para Acesso</Label>
-                <div className="relative mt-1.5">
+                <Label htmlFor="email" className="text-xs font-semibold text-slate-300 block mb-1.5">E-mail para Acesso</Label>
+                <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                   <Input
                     id="email"
@@ -302,19 +314,17 @@ export default function Checkout() {
                     {...register('email')}
                     placeholder="seu@email.com"
                     disabled={isProcessing}
-                    className="pl-10 h-11 bg-white/[0.03] border-white/10 rounded-xl focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30 text-white placeholder:text-slate-500"
+                    className="pl-10 h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-emerald-500 focus:bg-white/[0.05] focus:ring-1 focus:ring-emerald-500/30 text-white placeholder:text-slate-500 text-sm"
                   />
                 </div>
-                {errors.email ? (
+                {errors.email && (
                   <p className="text-xs text-rose-400 mt-1 font-medium">{errors.email.message}</p>
-                ) : (
-                  <p className="text-[11px] text-slate-400 mt-1">Seu acesso à série será liberado para este e-mail.</p>
                 )}
               </div>
 
               <div>
-                <Label htmlFor="phone" className="text-xs font-semibold text-slate-200">WhatsApp</Label>
-                <div className="relative mt-1.5">
+                <Label htmlFor="phone" className="text-xs font-semibold text-slate-300 block mb-1.5">WhatsApp com DDD</Label>
+                <div className="relative">
                   <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
                   <Input
                     id="phone"
@@ -323,34 +333,35 @@ export default function Checkout() {
                     placeholder="(11) 99999-9999"
                     maxLength={15}
                     disabled={isProcessing}
-                    className="pl-10 h-11 bg-white/[0.03] border-white/10 rounded-xl focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30 text-white placeholder:text-slate-500"
+                    className="pl-10 h-12 bg-white/[0.03] border-white/10 rounded-xl focus:border-emerald-500 focus:bg-white/[0.05] focus:ring-1 focus:ring-emerald-500/30 text-white placeholder:text-slate-500 text-sm"
                   />
                 </div>
-                {errors.phone ? (
+                {errors.phone && (
                   <p className="text-xs text-rose-400 mt-1 font-medium">{errors.phone.message}</p>
-                ) : (
-                  <p className="text-[11px] text-slate-400 mt-1">Receba a chave PIX e confirmação direta no WhatsApp.</p>
                 )}
               </div>
 
-              {/* Cupom */}
-              <div className="pt-1">
+              {/* Cupom Promocional Clean */}
+              <div className="pt-2">
                 <div className="flex gap-2">
-                  <Input
-                    id="coupon"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    placeholder="Cupom de desconto"
-                    disabled={isProcessing || !!appliedCoupon}
-                    className="h-10 flex-1 min-w-0 bg-white/[0.03] border-white/10 rounded-xl uppercase font-semibold text-xs text-white placeholder:text-slate-500"
-                  />
+                  <div className="relative flex-1">
+                    <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
+                    <Input
+                      id="coupon"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      placeholder="Cupom de desconto"
+                      disabled={isProcessing || !!appliedCoupon}
+                      className="pl-10 h-11 bg-white/[0.03] border-white/10 rounded-xl uppercase font-semibold text-xs text-white placeholder:text-slate-500"
+                    />
+                  </div>
                   {appliedCoupon ? (
                     <Button
                       type="button"
                       variant="outline"
                       onClick={handleRemoveCoupon}
                       disabled={isProcessing}
-                      className="h-10 px-3 shrink-0 rounded-xl border-rose-500/30 text-rose-400 hover:bg-rose-500/10 cursor-pointer text-xs"
+                      className="h-11 px-3.5 shrink-0 rounded-xl border-rose-500/30 text-rose-400 hover:bg-rose-500/10 cursor-pointer text-xs"
                     >
                       <X className="h-4 w-4 mr-1" /> Remover
                     </Button>
@@ -360,98 +371,105 @@ export default function Checkout() {
                       variant="outline"
                       onClick={handleApplyCoupon}
                       disabled={isProcessing || validateCoupon.isPending}
-                      className="h-10 px-3.5 shrink-0 rounded-xl border-white/10 hover:bg-white/[0.05] text-slate-200 font-semibold text-xs cursor-pointer"
+                      className="h-11 px-4 shrink-0 rounded-xl border-white/10 hover:bg-white/[0.06] text-white font-semibold text-xs cursor-pointer"
                     >
                       Aplicar
                     </Button>
                   )}
                 </div>
                 {appliedCoupon && (
-                  <p className="text-xs text-emerald-400 font-medium mt-1.5 flex items-center gap-1">
-                    ✓ Cupom "{appliedCoupon.code}" aplicado (- R$ {discount.toFixed(2)})
+                  <p className="text-xs text-emerald-400 font-semibold mt-1.5 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" /> Cupom "{appliedCoupon.code}" aplicado (- R$ {discount.toFixed(2)})
                   </p>
                 )}
               </div>
 
-              {/* Botão de Compra Principal */}
+              {/* Botão de Compra Principal (Stripe / Netflix Premium) */}
               <Button
                 type="submit"
-                className="w-full h-12 bg-emerald-400 hover:bg-emerald-300 text-black font-extrabold text-sm sm:text-base rounded-xl shadow-lg shadow-emerald-950/40 cursor-pointer transition-all active:scale-[0.99] flex items-center justify-center gap-2 mt-4"
                 disabled={isProcessing}
+                className="w-full h-13 sm:h-14 mt-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base sm:text-lg rounded-xl sm:rounded-2xl shadow-xl shadow-emerald-500/20 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="h-4 w-4 text-black animate-spin" />
-                    <span>Gerando PIX...</span>
+                    <Loader2 className="h-5 w-5 text-slate-950 animate-spin" />
+                    <span>Gerando Chave PIX...</span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 fill-black text-black" />
+                    <Zap className="w-5 h-5 fill-slate-950 text-slate-950" />
                     <span>Pagar R$ {total.toFixed(2).replace('.', ',')} com PIX</span>
                   </>
                 )}
               </Button>
 
-              <div className="flex items-center justify-center gap-4 pt-2 text-[11px] text-slate-400 text-center">
-                <span className="flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Liberação Imediata
-                </span>
-                <span className="flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Acesso Vitalício
-                </span>
-                <span className="flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" /> Sem Mensalidades
-                </span>
-              </div>
+              <p className="text-[11px] text-slate-500 text-center pt-1">
+                Ambiente seguro com liberação automática após confirmação do PIX.
+              </p>
             </form>
+
+            {/* Selos de Confiança Sóbrios */}
+            <div className="pt-6 mt-6 border-t border-white/[0.06] flex items-center justify-around text-center text-slate-400 text-[11px]">
+              <span className="flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-emerald-400" /> Criptografia 256-bit
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-emerald-400" /> Liberação na Hora
+              </span>
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Acesso Vitalício
+              </span>
+            </div>
           </div>
 
-          {/* Resumo do Pedido Desktop (5 colunas) */}
-          <div className="hidden md:block md:col-span-5 space-y-5">
-            <div className="bg-[#12131d] border border-white/10 rounded-3xl p-6 shadow-xl space-y-5">
-              <h2 className="text-lg font-bold text-white tracking-tight">Resumo do Pedido</h2>
+          {/* Resumo do Pedido Desktop (5 colunas no desktop, fixo) */}
+          <div className="hidden md:block md:col-span-5 space-y-4 sticky top-24">
+            <div className="bg-[#0f1018] border border-white/[0.08] rounded-3xl p-6 shadow-2xl space-y-5">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
+                Resumo do Pedido
+              </span>
 
               <div className="flex gap-4 pb-5 border-b border-white/[0.08]">
                 <img
                   src={imgSrc || series.image_url}
                   alt={series.title}
                   onError={() => setImgSrc(placeholderImage)}
-                  className="w-20 h-28 object-cover rounded-xl shadow-md ring-1 ring-white/10 shrink-0"
+                  className="w-20 h-28 object-cover rounded-xl shadow-lg ring-1 ring-white/10 shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-extrabold text-base text-white mb-1 truncate">{series.title}</h3>
                   <p className="text-xs text-slate-400 mb-2 truncate">{series.genre || 'Produção Exclusiva'}</p>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                    <ShieldCheck className="w-3 h-3 text-emerald-400" /> Temporada Completa em 4K
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <ShieldCheck className="w-3 h-3" /> Temporada Completa em 4K
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-2.5 text-sm">
-                <div className="flex justify-between text-slate-300">
-                  <span>Subtotal:</span>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-slate-400">
+                  <span>Preço</span>
                   <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
                 </div>
                 {discount > 0 && (
-                  <div className="flex justify-between text-emerald-400 font-bold">
-                    <span>Desconto:</span>
+                  <div className="flex justify-between text-emerald-400 font-semibold">
+                    <span>Desconto ({appliedCoupon?.code})</span>
                     <span>- R$ {discount.toFixed(2).replace('.', ',')}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-black text-2xl text-white pt-3 border-t border-white/[0.08]">
-                  <span>Total a Pagar:</span>
-                  <span className="text-emerald-400">
+                <div className="flex justify-between items-baseline font-black text-2xl text-white pt-3 border-t border-white/[0.08]">
+                  <span className="text-base font-bold text-slate-300">Total</span>
+                  <span className="text-2xl text-emerald-400">
                     R$ {total.toFixed(2).replace('.', ',')}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl text-xs text-slate-300 leading-relaxed">
-              <p className="font-semibold text-white mb-1 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Garantia Moments Séries
-              </p>
-              Sem mensalidades. O acesso é vitalício com suporte humanizado e atualizações inclusas.
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-xs text-slate-400 leading-relaxed flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <span>
+                Pagamento único sem mensalidades. Acesso direto liberado na sua tela e enviado ao seu e-mail e WhatsApp.
+              </span>
             </div>
           </div>
         </div>
