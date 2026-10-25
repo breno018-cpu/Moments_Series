@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutSchema, formatPhone, type CheckoutFormData } from "@/lib/validators";
-import { Loader2, CreditCard, ArrowLeft, Tag, X, ShieldCheck, Zap, Check } from "lucide-react";
+import { Loader2, CreditCard, ArrowLeft, Tag, X, ShieldCheck, Zap, Check, User, Mail, Phone, Lock, Sparkles } from "lucide-react";
 import { trackPixel } from "@/hooks/useMetaPixel";
 import { useValidateCoupon } from "@/hooks/useCoupons";
 import { captureUtms, captureLandingAndReferrer } from "@/lib/marketing";
@@ -225,25 +225,36 @@ export default function Checkout() {
       <Navbar />
       <main className="app-container py-20 sm:py-24">
         <div className="max-w-4xl mx-auto">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(-1)} 
-            className="mb-4 gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
-          <h1 className="text-4xl font-bold mb-8">Complete Sua Compra</h1>
+          <div className="flex items-center justify-between mb-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate(-1)} 
+              className="gap-2 text-slate-400 hover:text-white hover:bg-white/[0.05] rounded-xl text-xs font-semibold"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar ao catálogo
+            </Button>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[11px] font-bold">
+              <Lock className="w-3 h-3" />
+              <span>Ambiente 100% Blindado</span>
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Finalize Seu Pedido</h1>
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">Preencha seus dados para receber o link exclusivo e assistir imediatamente.</p>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-8 items-start">
             {/* Formulário de Pagamento */}
-            <Card className="p-6 sm:p-7 bg-[#0b0c15]/90 border border-white/10 backdrop-blur-2xl shadow-2xl rounded-3xl relative overflow-hidden ring-1 ring-purple-500/15">
+            <Card className="p-6 sm:p-7 bg-[#090a12]/95 border border-white/[0.09] backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] rounded-[28px] relative overflow-hidden ring-1 ring-purple-500/20">
               {/* Glow sutil */}
-              <div className="absolute top-0 right-0 w-48 h-32 bg-purple-500/10 blur-3xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-64 h-36 bg-emerald-500/10 blur-3xl pointer-events-none" />
 
               <div className="flex items-center justify-between pb-5 mb-5 border-b border-white/[0.08]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-inner">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/25 to-teal-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-inner">
                     <Zap className="h-5 w-5" />
                   </div>
                   <div>
@@ -252,21 +263,25 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-black text-emerald-400 uppercase tracking-wider">
-                  Blindado
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Instantâneo
                 </span>
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
                   <Label htmlFor="name" className="text-xs font-bold text-slate-200">Nome Completo *</Label>
-                  <Input
-                    id="name"
-                    {...register('name')}
-                    placeholder="Digite seu nome completo"
-                    disabled={isProcessing}
-                    className="mt-1.5 h-11 bg-white/[0.04] border-white/10 rounded-xl focus:border-purple-500/50 text-white placeholder:text-muted-foreground"
-                  />
+                  <div className="relative mt-1.5">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <Input
+                      id="name"
+                      {...register('name')}
+                      placeholder="Digite seu nome completo"
+                      disabled={isProcessing}
+                      className="pl-10 h-11 bg-white/[0.04] border-white/10 rounded-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 text-white placeholder:text-muted-foreground transition-all"
+                    />
+                  </div>
                   {errors.name && (
                     <p className="text-xs text-rose-400 mt-1 font-semibold">{errors.name.message}</p>
                   )}
@@ -274,32 +289,42 @@ export default function Checkout() {
 
                 <div>
                   <Label htmlFor="email" className="text-xs font-bold text-slate-200">E-mail para Receber o Acesso *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    {...register('email')}
-                    placeholder="seu@email.com"
-                    disabled={isProcessing}
-                    className="mt-1.5 h-11 bg-white/[0.04] border-white/10 rounded-xl focus:border-purple-500/50 text-white placeholder:text-muted-foreground"
-                  />
-                  {errors.email && (
+                  <div className="relative mt-1.5">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <Input
+                      id="email"
+                      type="email"
+                      {...register('email')}
+                      placeholder="seu@email.com"
+                      disabled={isProcessing}
+                      className="pl-10 h-11 bg-white/[0.04] border-white/10 rounded-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 text-white placeholder:text-muted-foreground transition-all"
+                    />
+                  </div>
+                  {errors.email ? (
                     <p className="text-xs text-rose-400 mt-1 font-semibold">{errors.email.message}</p>
+                  ) : (
+                    <p className="text-[11px] text-slate-400 mt-1">O link de acesso à série será enviado para este e-mail.</p>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="phone" className="text-xs font-bold text-slate-200">Telefone (WhatsApp) *</Label>
-                  <Input
-                    id="phone"
-                    value={phoneValue || ''}
-                    onChange={handlePhoneChange}
-                    placeholder="(11) 99999-9999"
-                    maxLength={15}
-                    disabled={isProcessing}
-                    className="mt-1.5 h-11 bg-white/[0.04] border-white/10 rounded-xl focus:border-purple-500/50 text-white placeholder:text-muted-foreground"
-                  />
-                  {errors.phone && (
+                  <Label htmlFor="phone" className="text-xs font-bold text-slate-200">WhatsApp para Notificações *</Label>
+                  <div className="relative mt-1.5">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <Input
+                      id="phone"
+                      value={phoneValue || ''}
+                      onChange={handlePhoneChange}
+                      placeholder="(11) 99999-9999"
+                      maxLength={15}
+                      disabled={isProcessing}
+                      className="pl-10 h-11 bg-white/[0.04] border-white/10 rounded-xl focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/20 text-white placeholder:text-muted-foreground transition-all"
+                    />
+                  </div>
+                  {errors.phone ? (
                     <p className="text-xs text-rose-400 mt-1 font-semibold">{errors.phone.message}</p>
+                  ) : (
+                    <p className="text-[11px] text-slate-400 mt-1">Receba a chave PIX e aviso de liberação direto no WhatsApp.</p>
                   )}
                 </div>
 
@@ -321,7 +346,7 @@ export default function Checkout() {
                           variant="outline"
                           onClick={handleRemoveCoupon}
                           disabled={isProcessing}
-                          className="h-11 px-4 rounded-xl border-rose-500/40 text-rose-400 hover:bg-rose-500/10"
+                          className="h-11 px-4 rounded-xl border-rose-500/40 text-rose-400 hover:bg-rose-500/10 cursor-pointer"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -331,7 +356,7 @@ export default function Checkout() {
                           variant="outline"
                           onClick={handleApplyCoupon}
                           disabled={isProcessing || validateCoupon.isPending}
-                          className="h-11 px-4 rounded-xl border-white/10 hover:bg-white/10 text-white font-bold text-xs"
+                          className="h-11 px-4 rounded-xl border-white/10 hover:border-purple-500/40 hover:bg-white/[0.06] text-white font-bold text-xs cursor-pointer"
                         >
                           <Tag className="h-4 w-4 mr-1 text-purple-400" />
                           Aplicar
@@ -347,19 +372,19 @@ export default function Checkout() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 shadow-button hover:shadow-glow glow-btn-premium bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-400 text-slate-950 font-black text-sm rounded-xl border border-yellow-300/40 cursor-pointer transition-all hover:scale-[1.01]"
+                    className="w-full h-13 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-sm sm:text-base rounded-2xl shadow-[0_12px_35px_rgba(16,185,129,0.35)] cursor-pointer transition-all active:scale-[0.99] border border-emerald-400/40"
                     size="lg"
                     disabled={isProcessing}
                   >
                     {isProcessing ? (
                       <>
-                        <Zap className="mr-2 h-4 w-4 text-slate-950 animate-pulse" />
-                        Gerando seu PIX...
+                        <Loader2 className="mr-2 h-5 w-5 text-black animate-spin" />
+                        Gerando seu PIX Seguro...
                       </>
                     ) : (
-                      <span className="flex items-center justify-center gap-1.5">
-                        <Zap className="w-4 h-4 fill-slate-950 text-slate-950" />
-                        <span>Gerar PIX — R$ {total.toFixed(2)}</span>
+                      <span className="flex items-center justify-center gap-2">
+                        <Zap className="w-5 h-5 fill-black text-black" />
+                        <span>Gerar PIX — R$ {total.toFixed(2).replace('.', ',')}</span>
                       </span>
                     )}
                   </Button>
@@ -403,50 +428,65 @@ export default function Checkout() {
 
             {/* Resumo do Pedido */}
             <div className="space-y-5">
-              <Card className="p-6 sm:p-7 bg-[#0b0c15]/90 border border-white/10 backdrop-blur-2xl shadow-2xl rounded-3xl">
-                <h2 className="text-xl sm:text-2xl font-black mb-5 text-white tracking-tight">Resumo do Pedido</h2>
+              <Card className="p-6 sm:p-7 bg-[#090a12]/95 border border-white/[0.09] backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] rounded-[28px] relative overflow-hidden">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Resumo do Pedido</h2>
+                  <span className="text-[11px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-0.5 rounded-full">
+                    Acesso Exclusivo
+                  </span>
+                </div>
 
                 <div className="flex gap-4 pb-5 border-b border-white/[0.08]">
-                  <img
-                    src={imgSrc || series.image_url}
-                    alt={series.title}
-                    onError={() => setImgSrc(placeholderImage)}
-                    className="w-24 h-36 object-cover rounded-2xl shadow-lg ring-1 ring-white/10 shrink-0"
-                  />
+                  <div className="relative shrink-0">
+                    <img
+                      src={imgSrc || series.image_url}
+                      alt={series.title}
+                      onError={() => setImgSrc(placeholderImage)}
+                      className="w-24 h-32 object-cover rounded-2xl shadow-xl ring-1 ring-white/10"
+                    />
+                    <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[9px] font-black text-emerald-400 border border-emerald-500/30">
+                      4K UHD
+                    </div>
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-extrabold text-base sm:text-lg text-white mb-1 truncate">{series.title}</h3>
-                    <p className="text-xs text-slate-400 mb-3">{series.genre || 'Produção Exclusiva'}</p>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-xs">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Temporada Completa em 4K
-                    </span>
+                    <h3 className="font-black text-base sm:text-lg text-white mb-1 truncate">{series.title}</h3>
+                    <p className="text-xs text-slate-400 mb-2.5">{series.genre || 'Produção Exclusiva'}</p>
+                    <div className="space-y-1">
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                        <ShieldCheck className="w-3 h-3 text-emerald-400" /> Temporada Completa
+                      </span>
+                      <p className="text-[11px] text-slate-400">Assista em qualquer celular, tablet ou PC.</p>
+                    </div>
                   </div>
                 </div>
 
                 <div className="pt-4 space-y-2.5 text-sm">
                   <div className="flex justify-between text-slate-300">
                     <span>Subtotal:</span>
-                    <span>R$ {subtotal.toFixed(2)}</span>
+                    <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-emerald-400 font-bold">
                       <span>Desconto Aplicado:</span>
-                      <span>- R$ {discount.toFixed(2)}</span>
+                      <span>- R$ {discount.toFixed(2).replace('.', ',')}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-black text-2xl text-white pt-3 border-t border-white/[0.08]">
                     <span>Total a Pagar:</span>
-                    <span className="text-emerald-400">R$ {total.toFixed(2)}</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
+                      R$ {total.toFixed(2).replace('.', ',')}
+                    </span>
                   </div>
                 </div>
               </Card>
 
               {/* Card de Garantia & Confiança */}
-              <Card className="p-6 bg-gradient-to-br from-purple-950/30 via-[#0b0c15] to-indigo-950/20 border border-purple-500/30 rounded-3xl shadow-xl">
+              <Card className="p-6 bg-gradient-to-br from-purple-950/30 via-[#090a12] to-emerald-950/20 border border-purple-500/25 rounded-[28px] shadow-xl">
                 <h3 className="font-black text-sm sm:text-base text-white mb-2 flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-purple-400" /> Garantia Moments Séries
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" /> Garantia Moments Séries
                 </h3>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Sem mensalidades ou assinaturas recorrentes. O acesso adquirido é vitalício, acompanhado de suporte humanizado e atualizações contínuas de episódios.
+                  Sem mensalidades ou assinaturas recorrentes. O acesso adquirido é vitalício, com suporte humanizado e atualizações contínuas de episódios.
                 </p>
               </Card>
             </div>

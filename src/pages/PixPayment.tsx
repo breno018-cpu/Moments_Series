@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, CheckCircle, Copy, Clock, Zap, ArrowLeft, QrCode } from "lucide-react";
+import { Loader2, CheckCircle, Copy, Clock, Zap, ArrowLeft, QrCode, CheckCircle2, Lock, Smartphone, ShieldCheck } from "lucide-react";
 import { triggerHaptic } from "@/lib/haptics";
 
 interface OrderData {
@@ -41,12 +41,15 @@ export default function PixPayment() {
   const [isLoading, setIsLoading] = useState(true);
   const [totalAmount, setTotalAmount] = useState(0);
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const copyPixCode = () => {
     if (order?.pix_qr_code) {
       navigator.clipboard.writeText(order.pix_qr_code);
+      setCopied(true);
       triggerHaptic('success');
-      toast.success('Código PIX copiado com sucesso!');
+      toast.success('Código PIX copiado com sucesso! Cole no seu banco.');
+      setTimeout(() => setCopied(false), 3000);
     }
   };
 
@@ -215,8 +218,11 @@ export default function PixPayment() {
       <main className="app-container py-20 sm:py-24">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom duration-700">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/15 border border-emerald-500/30 rounded-full mb-3.5 shadow-sm shadow-emerald-950">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-500/10 border border-emerald-500/25 rounded-full mb-3.5 shadow-sm shadow-emerald-950/60">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
               <span className="text-xs font-black text-emerald-400 uppercase tracking-wider">Aguardando Pagamento PIX</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black mb-2 text-white tracking-tight">Finalize seu Pagamento</h1>
@@ -225,21 +231,21 @@ export default function PixPayment() {
             </p>
           </div>
 
-          <Card className="p-6 sm:p-8 mb-6 bg-[#0b0c15]/95 border border-white/10 backdrop-blur-2xl shadow-2xl rounded-3xl relative overflow-hidden ring-1 ring-purple-500/20 animate-in fade-in-80 slide-in-from-bottom-2 duration-500 fill-mode-both">
+          <Card className="p-6 sm:p-8 mb-6 bg-[#090a12]/95 border border-white/[0.09] backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] rounded-[28px] relative overflow-hidden ring-1 ring-purple-500/20 animate-in fade-in-80 slide-in-from-bottom-2 duration-500 fill-mode-both">
             {/* Glow Superior */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-24 bg-gradient-to-r from-emerald-500/15 via-purple-500/20 to-amber-500/15 blur-3xl pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-32 bg-gradient-to-r from-emerald-500/20 via-teal-500/25 to-purple-600/20 blur-3xl pointer-events-none" />
 
             <div className="mb-6 relative z-10">
               <div className="text-center mb-5 pb-5 border-b border-white/[0.08]">
                 <span className="text-[11px] uppercase tracking-widest text-slate-400 font-bold block">Valor Total a Pagar</span>
-                <h2 className="text-3xl sm:text-4xl font-black text-emerald-400 mt-1 tracking-tight">
+                <h2 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 mt-1 tracking-tight">
                   R$ {totalAmount.toFixed(2).replace('.', ',')}
                 </h2>
               </div>
               
               <div className="space-y-3 mb-4">
                 {allOrders.map((item) => (
-                  <div key={item.order.id} className="flex items-center gap-3.5 p-3 bg-white/[0.03] border border-white/[0.08] rounded-2xl">
+                  <div key={item.order.id} className="flex items-center gap-3.5 p-3.5 bg-gradient-to-r from-white/[0.04] to-white/[0.01] border border-white/[0.08] rounded-2xl">
                     <img
                       src={item.series.image}
                       alt={item.series.title}
@@ -252,7 +258,7 @@ export default function PixPayment() {
                         {item.quantity > 1 && ` × ${item.quantity}`}
                       </p>
                     </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30">
+                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30">
                       Liberado na Hora
                     </span>
                   </div>
@@ -268,40 +274,79 @@ export default function PixPayment() {
 
             {order.pix_qr_code_base64 && (
               <div className="flex flex-col items-center justify-center mb-6 relative z-10">
-                <div className="bg-white p-4 rounded-3xl shadow-[0_15px_40px_rgba(0,0,0,0.6)] ring-4 ring-emerald-500/25 transition-transform hover:scale-[1.01]">
+                <div className="relative group p-4 bg-white rounded-3xl shadow-[0_15px_45px_rgba(16,185,129,0.18)] ring-4 ring-emerald-500/25 transition-transform hover:scale-[1.01]">
+                  {/* Viewfinder corners */}
+                  <div className="absolute -top-1.5 -left-1.5 w-5 h-5 border-t-2 border-l-2 border-emerald-400 rounded-tl-lg pointer-events-none" />
+                  <div className="absolute -top-1.5 -right-1.5 w-5 h-5 border-t-2 border-r-2 border-emerald-400 rounded-tr-lg pointer-events-none" />
+                  <div className="absolute -bottom-1.5 -left-1.5 w-5 h-5 border-b-2 border-l-2 border-emerald-400 rounded-bl-lg pointer-events-none" />
+                  <div className="absolute -bottom-1.5 -right-1.5 w-5 h-5 border-b-2 border-r-2 border-emerald-400 rounded-br-lg pointer-events-none" />
+
                   <img
                     src={`data:image/png;base64,${order.pix_qr_code_base64}`}
                     alt="QR Code PIX"
-                    className="w-56 h-56 sm:w-64 sm:h-64 object-contain rounded-lg"
+                    className="w-56 h-56 sm:w-64 sm:h-64 object-contain rounded-xl"
                   />
                 </div>
-                <span className="text-xs text-slate-300 mt-2.5 font-medium flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                <span className="text-xs text-slate-300 mt-3 font-medium flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
                   Aponte a câmera do aplicativo do seu banco
                 </span>
               </div>
             )}
 
             {order.pix_qr_code && (
-              <div className="space-y-2 relative z-10">
+              <div className="space-y-2.5 relative z-10">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-200">
-                  <span>Código PIX Copia e Cola:</span>
-                  <span className="text-[11px] text-purple-300 font-medium">Toque no botão para copiar</span>
+                  <span className="flex items-center gap-1.5">
+                    <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                    Código PIX Copia e Cola:
+                  </span>
+                  <span className="text-[11px] text-emerald-400 font-medium">Toque para copiar</span>
                 </div>
-                <div className="flex gap-2">
-                  <div className="flex-1 bg-white/[0.04] border border-white/10 p-3 rounded-xl text-xs break-all font-mono text-slate-300 select-all shadow-inner">
+
+                <div 
+                  onClick={copyPixCode}
+                  className="flex items-center justify-between gap-2 p-3 bg-white/[0.04] hover:bg-white/[0.07] border border-white/10 hover:border-emerald-500/40 rounded-2xl cursor-pointer transition-all shadow-inner"
+                >
+                  <div className="flex-1 font-mono text-[11px] text-slate-300 truncate select-all pr-2">
                     {order.pix_qr_code}
                   </div>
-                  <Button
-                    onClick={copyPixCode}
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0 h-12 w-12 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white border-none shadow-md shadow-purple-900/40 cursor-pointer"
-                    title="Copiar código PIX"
-                  >
-                    <Copy className="h-5 w-5" />
-                  </Button>
+                  <div className="shrink-0 flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    {copied ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Copiado!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copiar</span>
+                      </>
+                    )}
+                  </div>
                 </div>
+
+                <Button
+                  type="button"
+                  onClick={copyPixCode}
+                  className={`w-full h-12 rounded-2xl font-black text-sm gap-2 shadow-lg transition-all cursor-pointer ${
+                    copied
+                      ? "bg-emerald-600 text-white shadow-emerald-950/80 hover:bg-emerald-500"
+                      : "bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-black shadow-emerald-950/50 active:scale-[0.99]"
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                      <span>Código PIX Copiado com Sucesso!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 text-black" />
+                      <span>Copiar Código PIX (Copia e Cola)</span>
+                    </>
+                  )}
+                </Button>
               </div>
             )}
           </Card>
@@ -310,17 +355,18 @@ export default function PixPayment() {
             <Button 
               onClick={checkPaymentStatus}
               disabled={isCheckingPayment}
-              className="w-full h-12 rounded-2xl text-sm font-black bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-xl shadow-emerald-950/50 border border-emerald-400/30 cursor-pointer transition-all active:scale-[0.99]"
+              variant="outline"
+              className="w-full h-12 rounded-2xl text-xs sm:text-sm font-bold border-white/10 hover:border-emerald-500/30 hover:bg-white/[0.05] text-slate-200 cursor-pointer transition-all active:scale-[0.99]"
             >
               {isCheckingPayment ? (
                 <>
-                  <CheckCircle className="h-4 w-4 mr-2 text-emerald-300 animate-pulse" />
+                  <Loader2 className="h-4 w-4 mr-2 text-emerald-300 animate-spin" />
                   Consultando compensação no banco...
                 </>
               ) : (
                 <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Já Realizei o Pagamento
+                  <CheckCircle className="h-4 w-4 mr-2 text-slate-400" />
+                  Já Realizei a Transferência PIX
                 </>
               )}
             </Button>
