@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutSchema, formatPhone, type CheckoutFormData } from "@/lib/validators";
-import { Loader2, CreditCard, ArrowLeft, Tag, X, ShieldCheck, Zap } from "lucide-react";
+import { Loader2, CreditCard, ArrowLeft, Tag, X, ShieldCheck, Zap, Check } from "lucide-react";
 import { trackPixel } from "@/hooks/useMetaPixel";
 import { useValidateCoupon } from "@/hooks/useCoupons";
 import { captureUtms, captureLandingAndReferrer } from "@/lib/marketing";
