@@ -17,7 +17,7 @@ export function optimizedImage(
       "/storage/v1/render/image/public/"
     );
     const sep = transformed.includes("?") ? "&" : "?";
-    return `${transformed}${sep}width=${width}&quality=${quality}&resize=cover&format=${format}`;
+    return `${transformed}${sep}width=${width}&quality=${quality}&format=${format}`;
   }
 
   // Unsplash Image Optimization (usado nos mocks e banners)

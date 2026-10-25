@@ -19,7 +19,7 @@ export const StorefrontGridSkeleton: React.FC<StorefrontGridSkeletonProps> = ({ 
           style={{ animationDelay: `${Math.min(i * 35, 420)}ms` }}
         >
           {/* Card Poster Container */}
-          <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-white/[0.03] ring-1 ring-white/[0.06]">
+          <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white/[0.03] ring-1 ring-white/[0.06]">
             {/* Shimmer de fundo escuro */}
             <div className="absolute inset-0 shimmer-placeholder-dark" />
 
@@ -97,7 +97,7 @@ export const StorefrontRowSkeleton: React.FC<StorefrontRowSkeletonProps> = ({
                 className="flex-none w-[135px] xs:w-[150px] sm:w-[170px] md:w-[185px] lg:w-[195px] xl:w-[205px] animate-storefront-stagger pointer-events-none select-none"
                 style={{ animationDelay: `${Math.min(i * 40, 360)}ms` }}
               >
-                <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-white/[0.03] ring-1 ring-white/[0.06]">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white/[0.03] ring-1 ring-white/[0.06]">
                   <div className="absolute inset-0 shimmer-placeholder-dark" />
                   <div className="absolute top-2 left-2 h-4 w-7 rounded bg-white/[0.08]" />
                 </div>

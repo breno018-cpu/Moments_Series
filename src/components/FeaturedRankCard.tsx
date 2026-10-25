@@ -94,7 +94,7 @@ const FeaturedRankCardComponent = ({
         </div>
 
         {/* Card Poster do Destaque em formato ampliado e imponente */}
-        <div className="relative z-10 flex-1 aspect-[2/3] overflow-hidden rounded-2xl bg-card/60 border-2 border-amber-500/40 group-hover:border-amber-400 shadow-[0_15px_40px_rgba(0,0,0,0.85)] group-hover:shadow-[0_20px_50px_rgba(245,158,11,0.35)] transition-all duration-300">
+        <div className="relative z-10 flex-1 aspect-[3/4] overflow-hidden rounded-2xl bg-card/60 border-2 border-amber-500/40 group-hover:border-amber-400 shadow-[0_15px_40px_rgba(0,0,0,0.85)] group-hover:shadow-[0_20px_50px_rgba(245,158,11,0.35)] transition-all duration-300">
           <img
             src={imgSrc}
             alt={series.title}
@@ -102,7 +102,7 @@ const FeaturedRankCardComponent = ({
             onLoad={() => setIsLoaded(true)}
             loading="lazy"
             decoding="async"
-            className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${
+            className={`w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105 ${
               isLoaded || imgError ? "opacity-100" : "opacity-0"
             }`}
           />

@@ -121,13 +121,13 @@ export default function SeriesDetail() {
             <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr] gap-8 md:gap-12 items-start">
               {/* Coluna da Imagem (Pôster Vertical Cinematográfico) */}
               <div className="w-full max-w-[320px] mx-auto md:mx-0">
-                <div className="aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.7)] border border-white/[0.08] bg-card/25 backdrop-blur-2xl ring-1 ring-white/10 animate-in fade-in duration-500">
+                <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.7)] border border-white/[0.08] bg-card/25 backdrop-blur-2xl ring-1 ring-white/10 animate-in fade-in duration-500">
                   <img 
                     src={series.image_url ? optimizedImage(series.image_url, { width: 680, quality: 80 }) : placeholderImage} 
                     alt={series.title} 
                     fetchPriority="high"
                     decoding="async"
-                    className="w-full h-full object-cover transition-all duration-700 hover:scale-[1.03]"
+                    className="w-full h-full object-cover object-center transition-all duration-700 hover:scale-[1.03]"
                   />
                 </div>
 

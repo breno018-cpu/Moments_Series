@@ -72,7 +72,7 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
         onClick={() => setIsModalOpen(true)}
         className="group block cursor-pointer select-none card-content-visibility"
       >
-        <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-muted/80 ring-1 ring-white/10 group-hover:ring-purple-500/50 transition-colors duration-200">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted/80 ring-1 ring-white/10 group-hover:ring-purple-500/50 transition-colors duration-200">
           <img
             src={imgSrc}
             alt={anime.title}
@@ -80,7 +80,7 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
             onLoad={() => setIsLoaded(true)}
             loading="lazy"
             decoding="async"
-            className={`w-full h-full object-cover transition-opacity duration-200 ${
+            className={`w-full h-full object-cover object-center transition-opacity duration-200 ${
               isLoaded || imgError ? "opacity-100" : "opacity-0"
             }`}
           />
