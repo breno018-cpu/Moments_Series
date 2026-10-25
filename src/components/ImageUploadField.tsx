@@ -116,7 +116,7 @@ export function ImageUploadField({
         </div>
       </div>
 
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 w-full min-w-0">
         {/* Preview miniatura se houver imagem */}
         {value ? (
           <div className="relative group w-14 h-20 rounded-xl overflow-hidden border border-zinc-200 shrink-0 bg-zinc-50 shadow-xs">
@@ -145,9 +145,9 @@ export function ImageUploadField({
         )}
 
         {/* Controles de inserção */}
-        <div className="flex-1 space-y-1.5">
+        <div className="flex-1 min-w-0 space-y-1.5">
           {mode === 'upload' ? (
-            <div>
+            <div className="w-full min-w-0">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -172,7 +172,7 @@ export function ImageUploadField({
                 ) : (
                   <>
                     <Upload className="h-4 w-4 text-zinc-600" />
-                    <span>{value ? 'Substituir por arquivo do computador/celular' : 'Escolher imagem do dispositivo'}</span>
+                    <span className="truncate">{value ? 'Substituir por arquivo' : 'Escolher imagem do dispositivo'}</span>
                   </>
                 )}
               </Button>
@@ -181,15 +181,15 @@ export function ImageUploadField({
               </p>
             </div>
           ) : (
-            <div>
-              <div className="relative">
+            <div className="w-full min-w-0">
+              <div className="relative w-full">
                 <LinkIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
                 <Input
                   type="url"
                   placeholder="https://exemplo.com/imagem.jpg"
                   value={value}
                   onChange={(e) => onChange(e.target.value)}
-                  className="pl-8 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs h-10 rounded-xl"
+                  className="pl-8 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs h-10 rounded-xl w-full"
                 />
               </div>
               <p className="text-[10px] text-zinc-500 mt-1">
@@ -199,9 +199,9 @@ export function ImageUploadField({
           )}
 
           {value && (
-            <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+            <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 w-full min-w-0 max-w-full overflow-hidden">
               <CheckCircle2 className="h-3 w-3 text-emerald-600 shrink-0" />
-              <span className="truncate">Capa pronta: {value}</span>
+              <span className="truncate block min-w-0 flex-1">Capa pronta: {value}</span>
             </div>
           )}
         </div>

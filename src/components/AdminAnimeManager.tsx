@@ -117,7 +117,7 @@ export const AdminAnimeManager = () => {
               <Plus className="h-4 w-4 stroke-[3]" /> Adicionar Anime
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-5 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
+          <DialogContent className="w-[94vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-950">
                 <Sparkles className="h-5 w-5 text-teal-600" />
@@ -128,20 +128,20 @@ export const AdminAnimeManager = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-              <div>
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4 w-full max-w-full overflow-x-hidden">
+              <div className="w-full min-w-0">
                 <Label htmlFor="anime-title" className="text-xs font-bold text-zinc-700">Título do Anime</Label>
                 <Input id="anime-title" placeholder="Ex: Naruto Shippuden" value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })} required className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
+                <div className="min-w-0">
                   <Label htmlFor="anime-genre" className="text-xs font-bold text-zinc-700">Gênero / Categoria</Label>
                   <Input id="anime-genre" placeholder="Ex: Ação, Aventura" value={formData.genre}
                     onChange={(e) => setFormData({ ...formData, genre: e.target.value })} className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <Label htmlFor="anime-audio" className="text-xs font-bold text-zinc-700">Idioma do Áudio</Label>
                   <select id="anime-audio"
                     className="mt-1 flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 shadow-xs"
@@ -153,35 +153,37 @@ export const AdminAnimeManager = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
+                <div className="min-w-0">
                   <Label className="text-xs font-bold text-zinc-700">Nota (Avaliação)</Label>
                   <div className="mt-2">
                     <StarRating rating={formData.rating} onRatingChange={(r) => setFormData({ ...formData, rating: r })} size="lg" showValue />
                   </div>
                 </div>
-                <div>
+                <div className="min-w-0">
                   <Label htmlFor="anime-price" className="text-xs font-bold text-zinc-700">Preço de Venda (R$)</Label>
                   <Input id="anime-price" type="text" placeholder="Ex: 19,90" value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: formatCurrency(e.target.value) })} required className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
                 </div>
               </div>
 
-              <div>
+              <div className="w-full min-w-0">
                 <Label htmlFor="anime-desc" className="text-xs font-bold text-zinc-700">Descrição do Anime</Label>
                 <Textarea id="anime-desc" placeholder="Resumo envolvente do anime..." rows={3} value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
               </div>
 
-              <ImageUploadField
-                label="Capa do Anime (Upload de Foto ou Link Direto)"
-                value={formData.image_url}
-                onChange={(url) => setFormData({ ...formData, image_url: url })}
-                bucket="anime-images"
-                idPrefix="anime-cover-file"
-              />
+              <div className="w-full min-w-0">
+                <ImageUploadField
+                  label="Capa do Anime (Upload de Foto ou Link Direto)"
+                  value={formData.image_url}
+                  onChange={(url) => setFormData({ ...formData, image_url: url })}
+                  bucket="anime-images"
+                  idPrefix="anime-cover-file"
+                />
+              </div>
 
-              <div>
+              <div className="w-full min-w-0">
                 <Label htmlFor="anime-link" className="text-xs font-bold flex items-center gap-1.5 text-teal-700">Link de Entrega (Google Drive ou Telegram)</Label>
                 <Input id="anime-link" type="url" placeholder="https://drive.google.com/..." value={formData.access_link}
                   onChange={(e) => setFormData({ ...formData, access_link: e.target.value })} className="mt-1 bg-teal-50 border-teal-200 text-teal-900 font-mono text-xs shadow-xs" />

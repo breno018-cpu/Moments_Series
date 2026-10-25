@@ -126,7 +126,7 @@ export default function AdminCoupons({ embedded = false }: AdminCouponsProps = {
               <Plus className="h-4 w-4 stroke-[3]" /> Adicionar Cupom
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-5 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
+          <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-950">
                 <Tag className="h-5 w-5 text-amber-400" />
@@ -136,7 +136,7 @@ export default function AdminCoupons({ embedded = false }: AdminCouponsProps = {
                 Preencha os dados do cupom de desconto.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4 w-full max-w-full overflow-x-hidden">
               <div>
                 <Label htmlFor="code" className="text-xs font-bold text-zinc-700">Código do Cupom</Label>
                 <Input

@@ -211,7 +211,7 @@ export default function Admin() {
                     Nova Série
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-5 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
+                <DialogContent className="w-[94vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-950">
                       <Sparkles className="h-5 w-5 text-purple-600" />
@@ -222,20 +222,20 @@ export default function Admin() {
                     </DialogDescription>
                   </DialogHeader>
 
-                  <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                    <div>
+                  <form onSubmit={handleSubmit} className="space-y-4 mt-4 w-full max-w-full overflow-x-hidden">
+                    <div className="w-full min-w-0">
                       <Label htmlFor="title" className="text-xs font-bold text-zinc-700">Título da Série</Label>
                       <Input id="title" placeholder="Ex: Amor Proibido" value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })} required className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })} required className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs w-full" />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
+                      <div className="w-full min-w-0">
                         <Label htmlFor="genre" className="text-xs font-bold text-zinc-700">Gênero / Categoria</Label>
                         <Input id="genre" placeholder="Ex: Romance, Drama" value={formData.genre}
-                          onChange={(e) => setFormData({ ...formData, genre: e.target.value })} className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
+                          onChange={(e) => setFormData({ ...formData, genre: e.target.value })} className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs w-full" />
                       </div>
-                      <div>
+                      <div className="w-full min-w-0">
                         <Label htmlFor="audio_type" className="text-xs font-bold text-zinc-700">Idioma do Áudio</Label>
                         <select id="audio_type"
                           className="mt-1 flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 shadow-xs"
@@ -247,40 +247,42 @@ export default function Admin() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full min-w-0">
+                      <div className="w-full min-w-0">
                         <Label className="text-xs font-bold text-zinc-700">Avaliação (0 a 5 Estrelas)</Label>
-                        <div className="mt-2">
+                        <div className="mt-2 flex items-center overflow-hidden">
                           <StarRating rating={formData.rating} onRatingChange={(r) => setFormData({ ...formData, rating: r })} size="lg" showValue />
                         </div>
                       </div>
-                      <div>
+                      <div className="w-full min-w-0">
                         <Label htmlFor="price" className="text-xs font-bold text-zinc-700">Preço de Venda (R$)</Label>
                         <Input id="price" type="text" placeholder="Ex: 29,90" value={formData.price}
-                          onChange={(e) => setFormData({ ...formData, price: formatCurrency(e.target.value) })} required className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
+                          onChange={(e) => setFormData({ ...formData, price: formatCurrency(e.target.value) })} required className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs w-full" />
                       </div>
                     </div>
 
-                    <div>
+                    <div className="w-full min-w-0">
                       <Label htmlFor="description" className="text-xs font-bold text-zinc-700">Descrição da Série</Label>
                       <Textarea id="description" placeholder="Resumo envolvente da história..." rows={3} value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs" />
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="mt-1 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs w-full" />
                     </div>
 
-                    <ImageUploadField
-                      label="Capa da Série (Upload de Foto ou Link Direto)"
-                      value={formData.image_url}
-                      onChange={(url) => setFormData({ ...formData, image_url: url })}
-                      bucket="series-images"
-                      idPrefix="series-cover-file"
-                    />
+                    <div className="w-full min-w-0">
+                      <ImageUploadField
+                        label="Capa da Série (Upload de Foto ou Link Direto)"
+                        value={formData.image_url}
+                        onChange={(url) => setFormData({ ...formData, image_url: url })}
+                        bucket="series-images"
+                        idPrefix="series-cover-file"
+                      />
+                    </div>
 
-                    <div>
+                    <div className="w-full min-w-0">
                       <Label htmlFor="access_link" className="text-xs font-bold flex items-center gap-1.5 text-purple-700">
                         Link de Entrega (Google Drive ou Telegram)
                       </Label>
                       <Input id="access_link" type="url" placeholder="https://drive.google.com/..." value={formData.access_link}
-                        onChange={(e) => setFormData({ ...formData, access_link: e.target.value })} className="mt-1 bg-purple-50/50 border-purple-200 text-purple-900 font-mono text-xs shadow-xs" />
+                        onChange={(e) => setFormData({ ...formData, access_link: e.target.value })} className="mt-1 bg-purple-50/50 border-purple-200 text-purple-900 font-mono text-xs shadow-xs w-full" />
                     </div>
 
                     <div className="flex items-center space-x-2 pt-2">
