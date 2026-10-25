@@ -225,13 +225,13 @@ export default function CartCheckout() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="app-container py-20 sm:py-24">
+      <main className="app-container py-16 sm:py-24 max-w-full overflow-x-hidden">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
             <Button 
               variant="ghost" 
               onClick={() => navigate(-1)} 
-              className="gap-2 text-slate-400 hover:text-white hover:bg-white/[0.05] rounded-xl text-xs font-semibold"
+              className="h-9 px-3 gap-1.5 text-slate-400 hover:text-white hover:bg-white/[0.05] rounded-xl text-xs font-semibold"
             >
               <ArrowLeft className="w-4 h-4" />
               Continuar comprando
@@ -243,38 +243,38 @@ export default function CartCheckout() {
             </div>
           </div>
 
-          <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Finalizar Compra do Carrinho</h1>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">Finalizar Compra do Carrinho</h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">Preencha seus dados para receber o acesso imediato de todos os títulos adquiridos.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 items-start">
+          <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-start">
             {/* Formulário de Pagamento */}
-            <Card className="p-6 sm:p-7 bg-[#090a12]/95 border border-white/[0.09] backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] rounded-[28px] relative overflow-hidden ring-1 ring-purple-500/20">
+            <Card className="p-4 sm:p-7 bg-[#090a12]/95 border border-white/[0.09] backdrop-blur-3xl shadow-2xl rounded-2xl sm:rounded-[28px] relative overflow-hidden ring-1 ring-purple-500/20 max-w-full">
               {/* Glow sutil */}
               <div className="absolute top-0 right-0 w-64 h-36 bg-emerald-500/10 blur-3xl pointer-events-none" />
 
-              <div className="flex items-center justify-between pb-5 mb-5 border-b border-white/[0.08]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/25 to-teal-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-inner">
-                    <CreditCard className="h-5 w-5" />
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500/25 to-teal-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shadow-inner">
+                    <CreditCard className="h-4 w-4 sm:h-5 sm:w-5" />
                   </div>
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Checkout Express</h2>
-                    <p className="text-xs text-slate-300">Pagamento seguro via PIX</p>
+                    <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight">Checkout Express</h2>
+                    <p className="text-[11px] sm:text-xs text-slate-300">Pagamento seguro via PIX</p>
                   </div>
                 </div>
 
-                <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] sm:text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Blindado
                 </span>
               </div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5 sm:space-y-4">
                 <div>
                   <Label htmlFor="name" className="text-xs font-bold text-slate-200">Nome Completo *</Label>
-                  <div className="relative mt-1.5">
+                  <div className="relative mt-1">
                     <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     <Input
                       id="name"
@@ -291,7 +291,7 @@ export default function CartCheckout() {
 
                 <div>
                   <Label htmlFor="email" className="text-xs font-bold text-slate-200">E-mail para Receber o Acesso *</Label>
-                  <div className="relative mt-1.5">
+                  <div className="relative mt-1">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     <Input
                       id="email"
@@ -305,13 +305,13 @@ export default function CartCheckout() {
                   {errors.email ? (
                     <p className="text-xs text-rose-400 mt-1 font-semibold">{errors.email.message}</p>
                   ) : (
-                    <p className="text-[11px] text-slate-400 mt-1">O link de liberação será enviado para este endereço.</p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-400 mt-1">O link de liberação será enviado para este endereço.</p>
                   )}
                 </div>
 
                 <div>
                   <Label htmlFor="phone" className="text-xs font-bold text-slate-200">WhatsApp para Notificações *</Label>
-                  <div className="relative mt-1.5">
+                  <div className="relative mt-1">
                     <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     <Input
                       id="phone"
@@ -326,21 +326,21 @@ export default function CartCheckout() {
                   {errors.phone ? (
                     <p className="text-xs text-rose-400 mt-1 font-semibold">{errors.phone.message}</p>
                   ) : (
-                    <p className="text-[11px] text-slate-400 mt-1">Receba a chave PIX e confirmação direta no WhatsApp.</p>
+                    <p className="text-[10px] sm:text-[11px] text-slate-400 mt-1">Receba a chave PIX e confirmação direta no WhatsApp.</p>
                   )}
                 </div>
 
-                <div className="space-y-4 pt-2">
+                <div className="space-y-3.5 pt-1">
                   <div>
                     <Label htmlFor="coupon" className="text-xs font-bold text-slate-200">Cupom Promocional</Label>
-                    <div className="flex gap-2 mt-1.5">
+                    <div className="flex gap-2 mt-1">
                       <Input
                         id="coupon"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                         placeholder="Ex: DESCONTO10"
                         disabled={isProcessing || !!appliedCoupon}
-                        className="h-11 bg-white/[0.04] border-white/10 rounded-xl uppercase font-semibold text-white placeholder:text-muted-foreground"
+                        className="h-11 flex-1 min-w-0 bg-white/[0.04] border-white/10 rounded-xl uppercase font-semibold text-white placeholder:text-muted-foreground"
                       />
                       {appliedCoupon ? (
                         <Button
@@ -348,7 +348,7 @@ export default function CartCheckout() {
                           variant="outline"
                           onClick={handleRemoveCoupon}
                           disabled={isProcessing}
-                          className="h-11 px-4 rounded-xl border-rose-500/40 text-rose-400 hover:bg-rose-500/10 cursor-pointer"
+                          className="h-11 w-11 p-0 shrink-0 rounded-xl border-rose-500/40 text-rose-400 hover:bg-rose-500/10 cursor-pointer flex items-center justify-center"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -358,9 +358,9 @@ export default function CartCheckout() {
                           variant="outline"
                           onClick={handleApplyCoupon}
                           disabled={isProcessing || validateCoupon.isPending}
-                          className="h-11 px-4 rounded-xl border-white/10 hover:border-purple-500/40 hover:bg-white/[0.06] text-white font-bold text-xs cursor-pointer"
+                          className="h-11 px-3.5 shrink-0 rounded-xl border-white/10 hover:border-purple-500/40 hover:bg-white/[0.06] text-white font-bold text-xs cursor-pointer flex items-center justify-center"
                         >
-                          <Tag className="h-4 w-4 mr-1 text-purple-400" />
+                          <Tag className="h-3.5 w-3.5 mr-1 text-purple-400" />
                           Aplicar
                         </Button>
                       )}
@@ -372,39 +372,40 @@ export default function CartCheckout() {
                     )}
                   </div>
 
+                  {/* Botão Padronizado Mobile (h-12, rounded-xl) */}
                   <Button
                     type="submit"
-                    className="w-full h-13 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-sm sm:text-base rounded-2xl shadow-[0_12px_35px_rgba(16,185,129,0.35)] cursor-pointer transition-all active:scale-[0.99] border border-emerald-400/40"
+                    className="w-full h-12 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-black font-black text-sm sm:text-base rounded-xl shadow-lg shadow-emerald-950/40 cursor-pointer transition-all active:scale-[0.99] border border-emerald-400/40 flex items-center justify-center gap-2"
                     disabled={isProcessing}
                   >
                     {isProcessing ? (
                       <>
-                        <Loader2 className="mr-2 h-5 w-5 text-black animate-spin" />
-                        Gerando seu PIX Seguro...
+                        <Loader2 className="h-4 w-4 text-black animate-spin" />
+                        <span>Gerando seu PIX Seguro...</span>
                       </>
                     ) : (
-                      <span className="flex items-center justify-center gap-2">
-                        <Zap className="w-5 h-5 fill-black text-black" />
+                      <>
+                        <Zap className="w-4 h-4 fill-black text-black" />
                         <span>Gerar PIX — R$ {total.toFixed(2).replace('.', ',')}</span>
-                      </span>
+                      </>
                     )}
                   </Button>
 
-                  <p className="text-[11px] text-muted-foreground text-center mt-2.5">
+                  <p className="text-[11px] text-muted-foreground text-center mt-2">
                     Ao confirmar o pedido, você concorda com nossos{" "}
                     <Link to="/termos" target="_blank" className="text-primary hover:underline">
                       Termos de Uso
                     </Link>{" "}
                     e{" "}
                     <Link to="/privacidade" target="_blank" className="text-primary hover:underline">
-                      Política de Privacidade
+                      Privacidade
                     </Link>.
                   </p>
                 </div>
               </form>
 
-              <div className="mt-6 p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-                <div className="text-xs text-slate-300 grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="mt-5 p-3 sm:p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <div className="text-[11px] sm:text-xs text-slate-300 grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
                       <Check className="w-2.5 h-2.5 stroke-[3]" />
@@ -428,11 +429,11 @@ export default function CartCheckout() {
             </Card>
 
             {/* Resumo do Carrinho */}
-            <div className="space-y-5">
-              <Card className="p-6 sm:p-7 bg-[#090a12]/95 border border-white/[0.09] backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] rounded-[28px] relative overflow-hidden">
-                <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/[0.08]">
-                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Resumo do Pedido</h2>
-                  <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
+            <div className="space-y-4 sm:space-y-5">
+              <Card className="p-4 sm:p-7 bg-[#090a12]/95 border border-white/[0.09] backdrop-blur-3xl shadow-2xl rounded-2xl sm:rounded-[28px] relative overflow-hidden max-w-full">
+                <div className="flex items-center justify-between mb-4 sm:mb-5 pb-3 border-b border-white/[0.08]">
+                  <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight">Resumo do Pedido</h2>
+                  <span className="text-[10px] sm:text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
                     {items.length} {items.length === 1 ? 'título' : 'títulos'}
                   </span>
                 </div>
@@ -466,7 +467,7 @@ export default function CartCheckout() {
                   })}
                 </div>
 
-                <div className="border-t border-white/[0.08] pt-4 space-y-2.5 text-sm">
+                <div className="border-t border-white/[0.08] pt-3 sm:pt-4 space-y-2 text-xs sm:text-sm">
                   <div className="flex justify-between text-slate-300">
                     <span>Subtotal:</span>
                     <span>R$ {subtotal.toFixed(2).replace('.', ',')}</span>
@@ -479,7 +480,7 @@ export default function CartCheckout() {
                     </div>
                   )}
                   
-                  <div className="flex justify-between text-2xl font-black text-white border-t border-white/[0.08] pt-3">
+                  <div className="flex justify-between text-xl sm:text-2xl font-black text-white border-t border-white/[0.08] pt-2.5">
                     <span>Total a Pagar:</span>
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
                       R$ {total.toFixed(2).replace('.', ',')}
@@ -489,11 +490,11 @@ export default function CartCheckout() {
               </Card>
 
               {/* Card de Garantia & Confiança */}
-              <Card className="p-6 bg-gradient-to-br from-purple-950/30 via-[#090a12] to-emerald-950/20 border border-purple-500/25 rounded-[28px] shadow-xl">
-                <h3 className="font-black text-sm sm:text-base text-white mb-2 flex items-center gap-2">
+              <Card className="p-4 sm:p-6 bg-gradient-to-br from-purple-950/30 via-[#090a12] to-emerald-950/20 border border-purple-500/25 rounded-2xl sm:rounded-[28px] shadow-xl max-w-full">
+                <h3 className="font-black text-xs sm:text-base text-white mb-1.5 flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-400" /> Acesso Imediato & Vitalício
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-300 leading-relaxed">
                   Todos os títulos do seu pedido serão sincronizados e liberados instantaneamente após o pagamento. Você receberá o acesso no seu e-mail e na tela seguinte.
                 </p>
               </Card>
