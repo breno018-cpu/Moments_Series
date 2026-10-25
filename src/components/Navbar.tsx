@@ -35,7 +35,14 @@ export const Navbar = () => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 500);
-    return () => clearTimeout(timer);
+
+    const handleOpenMenu = () => setMobileMenuOpen(true);
+    window.addEventListener('open-mobile-menu', handleOpenMenu);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('open-mobile-menu', handleOpenMenu);
+    };
   }, []);
 
   const { data: settings } = useSiteSettings();
@@ -464,10 +471,13 @@ export const Navbar = () => {
               </Button>
             )}
 
-            <CartDrawer />
+            {/* Carrinho - no mobile é acessado confortavelmente na barra inferior fixa */}
+            <div className="hidden sm:inline-block">
+              <CartDrawer />
+            </div>
 
             {/* Menu Lateral Completo no Mobile */}
-            <div className="md:hidden flex items-center">
+            <div className="md:hidden flex items-center pr-0.5">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button
@@ -567,77 +577,6 @@ export const Navbar = () => {
                 </SheetContent>
               </Sheet>
             </div>
-          </div>
-        </div>
-
-        {/* Mobile sub-nav — Início / Séries / Animes / Favoritos / Instalar */}
-        <div className="md:hidden border-t border-border/40 bg-background/80 backdrop-blur-md">
-          <div className="app-container flex items-center justify-around gap-1 py-1 px-1">
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-[10px] sm:text-xs font-semibold rounded-lg transition-colors ${
-                  isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-foreground"
-                }`
-              }
-            >
-              <Home className="h-4 w-4" />
-              <span>Início</span>
-            </NavLink>
-            <NavLink
-              to="/?view=series"
-              className={() =>
-                `flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-[10px] sm:text-xs font-semibold rounded-lg transition-colors ${
-                  isSeriesActive
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-foreground"
-                }`
-              }
-            >
-              <Tv className="h-4 w-4" />
-              <span>Séries</span>
-            </NavLink>
-            <NavLink
-              to="/animes"
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-[10px] sm:text-xs font-semibold rounded-lg transition-colors ${
-                  isActive
-                    ? "text-accent bg-accent/10"
-                    : "text-foreground/70 hover:text-foreground"
-                }`
-              }
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>Animes</span>
-            </NavLink>
-            <NavLink
-              to="/favoritos"
-              className={({ isActive }) =>
-                `flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-[10px] sm:text-xs font-semibold rounded-lg transition-colors ${
-                  isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-foreground"
-                }`
-              }
-            >
-              <Heart className="h-4 w-4" />
-              <span>Favoritos</span>
-            </NavLink>
-
-            {!isInstalled && (
-              <button
-                type="button"
-                onClick={promptInstall}
-                className="flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-[10px] sm:text-xs font-bold text-purple-400 bg-purple-500/15 rounded-lg hover:bg-purple-500/25 transition-all border border-purple-500/30"
-                title="Adicionar Moments à tela de início"
-              >
-                <Download className="h-4 w-4" />
-                <span>App</span>
-              </button>
-            )}
           </div>
         </div>
 

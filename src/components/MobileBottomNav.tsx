@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Film, Sparkles, ShoppingBag, Download } from 'lucide-react';
+import { Home, Film, Sparkles, ShoppingBag, Menu } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { usePWA } from '@/hooks/usePWA';
 import { triggerHaptic } from '@/lib/haptics';
@@ -31,9 +31,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onOpenCart }) 
     }
   };
 
-  const handleInstallClick = () => {
-    triggerHaptic('medium');
-    promptInstall();
+  const handleMenuClick = () => {
+    triggerHaptic('light');
+    window.dispatchEvent(new CustomEvent('open-mobile-menu'));
   };
 
   // Não exibir no checkout para foco total na conversão
@@ -47,6 +47,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onOpenCart }) 
     return null;
   }
 
+  const isSeriesActive = location.pathname === '/' && location.search.includes('series');
+  const isHomeActive = location.pathname === '/' && !location.search.includes('series');
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#090b10]/98 border-t border-white/[0.08] backdrop-blur-sm pb-[max(env(safe-area-inset-bottom),8px)] pt-1 px-2 select-none shadow-[0_-10px_25px_rgba(0,0,0,0.7)] transform-gpu">
       <nav className="flex items-center justify-around">
@@ -55,7 +58,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onOpenCart }) 
           type="button"
           onClick={() => handleNavClick('/')}
           className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
-            location.pathname === '/'
+            isHomeActive
               ? 'text-purple-400 font-bold scale-105'
               : 'text-slate-400 hover:text-slate-200'
           }`}
@@ -67,9 +70,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onOpenCart }) 
         {/* Séries */}
         <button
           type="button"
-          onClick={() => handleNavClick('/')}
+          onClick={() => handleNavClick('/?view=series')}
           className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all ${
-            location.pathname === '/' && location.search.includes('series')
+            isSeriesActive
               ? 'text-purple-400 font-bold scale-105'
               : 'text-slate-400 hover:text-slate-200'
           }`}
@@ -109,17 +112,16 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ onOpenCart }) 
           <span className="text-[10px] tracking-tight">Carrinho</span>
         </button>
 
-        {/* Instalar App */}
-        {!isInstalled && (
-          <button
-            type="button"
-            onClick={handleInstallClick}
-            className="flex flex-col items-center justify-center py-1 px-2 rounded-xl text-amber-400 hover:text-amber-300 transition-all animate-pulse"
-          >
-            <Download className="w-5 h-5 mb-0.5" />
-            <span className="text-[10px] font-bold tracking-tight">Instalar</span>
-          </button>
-        )}
+        {/* Menu / Mais (3 barrinhas) */}
+        <button
+          type="button"
+          onClick={handleMenuClick}
+          className="flex flex-col items-center justify-center py-1 px-2.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all"
+          aria-label="Abrir mais opções e categorias"
+        >
+          <Menu className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px] tracking-tight">Mais</span>
+        </button>
       </nav>
     </div>
   );
