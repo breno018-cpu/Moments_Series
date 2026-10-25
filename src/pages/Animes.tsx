@@ -133,6 +133,8 @@ const Row = ({
 ================================================================ */
 const HeroRotator = ({ items }: { items: Anime[] }) => {
   const [index, setIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const list = items.slice(0, 5);
 
   useEffect(() => {
@@ -141,11 +143,35 @@ const HeroRotator = ({ items }: { items: Anime[] }) => {
     return () => clearInterval(t);
   }, [list.length]);
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(null);
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+  const handleTouchEnd = () => {
+    if (touchStart === null || touchEnd === null) return;
+    const distance = touchStart - touchEnd;
+    if (distance > 40) {
+      setIndex((i) => (i + 1) % list.length);
+    } else if (distance < -40) {
+      setIndex((i) => (i - 1 + list.length) % list.length);
+    }
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
   if (list.length === 0) return null;
   const hero = list[index];
 
   return (
-    <section className="relative h-[56vh] sm:h-[66vh] min-h-[420px] max-h-[640px] overflow-hidden">
+    <section
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="relative h-[56vh] sm:h-[66vh] min-h-[420px] max-h-[640px] overflow-hidden select-none"
+    >
       {list.map((a, i) => (
         <div
           key={a.id}

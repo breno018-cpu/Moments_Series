@@ -83,22 +83,22 @@ const RowComponent = ({
               {items.length}
             </span>
           </div>
-          <div className="hidden sm:flex items-center gap-1">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => scroll("left")}
               disabled={!canLeft}
               aria-label="Anterior"
-              className="h-8 w-8 rounded-full border border-white/10 bg-white/5 backdrop-blur flex items-center justify-center text-foreground/80 hover:text-foreground hover:bg-white/15 hover:border-white/20 active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-white/10 bg-white/5 backdrop-blur flex items-center justify-center text-foreground/80 hover:text-foreground hover:bg-white/15 hover:border-white/20 active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
             <button
               onClick={() => scroll("right")}
               disabled={!canRight}
               aria-label="Próximo"
-              className="h-8 w-8 rounded-full border border-white/10 bg-white/5 backdrop-blur flex items-center justify-center text-foreground/80 hover:text-foreground hover:bg-white/15 hover:border-white/20 active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-white/10 bg-white/5 backdrop-blur flex items-center justify-center text-foreground/80 hover:text-foreground hover:bg-white/15 hover:border-white/20 active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
           </div>
         </div>
@@ -114,7 +114,7 @@ const RowComponent = ({
           <div
             ref={scrollRef}
             style={{ WebkitOverflowScrolling: 'touch' }}
-            className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 touch-pan-x"
+            className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 touch-pan-x scroll-smooth"
           >
             {displayItems.map((s) => (
               <div key={s.id} className="flex-none w-[135px] xs:w-[150px] sm:w-[170px] md:w-[185px] lg:w-[195px] xl:w-[205px]">
@@ -511,7 +511,7 @@ const Index = () => {
                     <div className="relative z-10">
                       <div
                         style={{ WebkitOverflowScrolling: 'touch' }}
-                        className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 pt-2 touch-pan-x"
+                        className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 pt-2 touch-pan-x scroll-smooth"
                       >
                         {featured.map((s, idx) => (
                           <div

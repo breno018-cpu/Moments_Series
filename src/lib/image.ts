@@ -1,30 +1,21 @@
 /**
- * Transforma URLs do Supabase Storage, Unsplash e CDNs para usar redimensionamento on-the-fly.
- * Converte automaticamente para WebP ultra-leve (15KB - 30KB por poster) e reduz drasticamente o consumo de banda.
+ * Transforma e normaliza URLs de imagem para o catálogo.
+ * Mantém a URL original sem distorções de aspecto causadas por transformações externas.
  */
 export function optimizedImage(
   url: string | undefined | null,
-  opts: { width?: number; quality?: number; format?: 'webp' | 'origin' } = {}
+  _opts: { width?: number; quality?: number; format?: 'webp' | 'origin' } = {}
 ): string {
   if (!url) return "";
 
-  const { width = 360, quality = 70, format = 'webp' } = opts;
-
-  // Supabase Storage Render Image API (WebP + Resize)
-  if (url.includes("/storage/v1/object/public/")) {
-    const transformed = url.replace(
-      "/storage/v1/object/public/",
-      "/storage/v1/render/image/public/"
-    );
-    const sep = transformed.includes("?") ? "&" : "?";
-    return `${transformed}${sep}width=${width}&quality=${quality}&format=${format}`;
-  }
-
   // Unsplash Image Optimization (usado nos mocks e banners)
   if (url.includes("images.unsplash.com")) {
+    const { width = 600, quality = 80 } = _opts;
     const base = url.split("?")[0];
-    return `${base}?w=${width}&q=${quality}&auto=format&fit=crop&fm=webp`;
+    return `${base}?w=${width}&q=${quality}&auto=format&fm=webp`;
   }
 
+  // Para imagens do Supabase Storage e CDNs próprios, retorna a URL original íntegra
+  // para preservar a proporção exata e evitar cortes arbitrários de cabeça e texto.
   return url;
 }

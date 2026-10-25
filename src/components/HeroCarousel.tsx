@@ -16,6 +16,8 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedSeries, setSelectedSeries] = useState<Series | null>(null);
   const [imgError, setImgError] = useState<Record<string, boolean>>({});
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const featuredSeries = items;
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
   }, [items]);
 
   useEffect(() => {
-    if (featuredSeries.length === 0) return;
+    if (featuredSeries.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % featuredSeries.length);
     }, 6000);
@@ -35,6 +37,29 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
     setCurrentSlide((prev) => (prev + 1) % featuredSeries.length);
   const prevSlide = () =>
     setCurrentSlide((prev) => (prev - 1 + featuredSeries.length) % featuredSeries.length);
+
+  // Suporte a swipe no mobile para rotacionar os slides do banner
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(null);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStart === null || touchEnd === null) return;
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 40;
+    if (distance > minSwipeDistance) {
+      nextSlide();
+    } else if (distance < -minSwipeDistance) {
+      prevSlide();
+    }
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
 
   if (!featuredSeries.length) return null;
 
@@ -50,7 +75,12 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
       });
 
   return (
-    <div className="relative h-[56vh] sm:h-[66vh] min-h-[420px] max-h-[640px] overflow-hidden bg-background">
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="relative h-[56vh] sm:h-[66vh] min-h-[420px] max-h-[640px] overflow-hidden bg-background select-none touch-pan-y"
+    >
       <div key={series.id} className="absolute inset-0 animate-in fade-in duration-300">
         <img
           src={imageSrc}
@@ -58,7 +88,7 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
           onError={() => setImgError((p) => ({ ...p, [series.id]: true }))}
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 w-full h-full object-cover object-center select-none"
+          className="absolute inset-0 w-full h-full object-cover object-top sm:object-center select-none"
         />
 
         {/* Sem névoa — apenas base inferior sólida para legibilidade do texto */}
@@ -124,11 +154,11 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
         <link rel="preload" as="image" href={optimizedImage(featuredSeries[nextIdx].image_url, { width: 1600, quality: 80 })} />
       )}
 
-      {/* Setas minimalistas */}
+      {/* Setas minimalistas com suporte a toque tanto no mobile quanto no desktop */}
       <Button
         variant="ghost"
         size="icon"
-        className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 bg-background/30 hover:bg-background/60 backdrop-blur-sm h-10 w-10 rounded-full z-10 border border-foreground/15"
+        className="flex absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 backdrop-blur-md h-8 w-8 sm:h-10 sm:w-10 rounded-full z-20 border border-white/20 text-white"
         onClick={prevSlide}
         aria-label="Anterior"
       >
@@ -137,24 +167,24 @@ export const HeroCarousel = ({ items }: HeroCarouselProps) => {
       <Button
         variant="ghost"
         size="icon"
-        className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 bg-background/30 hover:bg-background/60 backdrop-blur-sm h-10 w-10 rounded-full z-10 border border-foreground/15"
+        className="flex absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 backdrop-blur-md h-8 w-8 sm:h-10 sm:w-10 rounded-full z-20 border border-white/20 text-white"
         onClick={nextSlide}
         aria-label="Próximo"
       >
         <ChevronRight className="w-4 h-4" />
       </Button>
 
-      {/* Indicadores — perfeitamente centralizados */}
-      <div className="absolute bottom-4 sm:bottom-6 inset-x-0 flex justify-center items-center gap-2 z-10 pointer-events-none">
-        <div className="flex items-center gap-2 pointer-events-auto px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-xs">
+      {/* Indicadores com área de toque confortável */}
+      <div className="absolute bottom-3 sm:bottom-6 inset-x-0 flex justify-center items-center gap-1.5 sm:gap-2 z-20 pointer-events-none">
+        <div className="flex items-center gap-1.5 sm:gap-2 pointer-events-auto px-3 py-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
           {featuredSeries.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-0.5 rounded-full transition-all duration-500 cursor-pointer ${
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                 index === currentSlide
-                  ? "w-10 sm:w-12 bg-white shadow-sm"
-                  : "w-5 sm:w-6 bg-white/30 hover:bg-white/60"
+                  ? "w-8 sm:w-12 bg-white shadow-sm"
+                  : "w-3 sm:w-6 bg-white/40 hover:bg-white/70"
               }`}
               aria-label={`Slide ${index + 1}`}
             />
