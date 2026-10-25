@@ -28,5 +28,12 @@
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "src/router.tsx",
+    "src/routes/**/*",
+    "src/server.ts",
+    "src/start.ts",
+    "src/routeTree.gen.ts"
   ]
 }

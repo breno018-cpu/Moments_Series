@@ -64,7 +64,6 @@ export default function Checkout() {
       name: savedData.name || '',
       email: savedData.email || '',
       phone: savedData.phone || '',
-      cpf: savedData.cpf || '',
     }
   });
 
@@ -156,7 +155,6 @@ export default function Checkout() {
           name: data.name,
           email: data.email,
           phone: data.phone,
-          cpf: data.cpf
         }));
         
         // Ativa o Checkout Transparente na mesma tela sem redirecionar

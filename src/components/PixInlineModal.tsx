@@ -86,7 +86,9 @@ export function PixInlineModal({
         if (!hasTriggeredSuccess.current) {
           hasTriggeredSuccess.current = true;
           setTimeout(() => {
-            onSuccess(orderId, orderToken);
+            if (typeof onSuccess === "function") {
+              onSuccess(orderId, orderToken);
+            }
           }, 1200);
         }
       } else {
@@ -216,7 +218,9 @@ export function PixInlineModal({
 
             toast.success("Pagamento confirmado via PIX! Liberando seu acesso imediato...");
             setTimeout(() => {
-              onSuccess(orderId, orderToken);
+              if (typeof onSuccess === "function") {
+                onSuccess(orderId, orderToken);
+              }
             }, 1200);
           }
         }
@@ -279,7 +283,7 @@ export function PixInlineModal({
             <div className="text-right shrink-0 pl-2">
               <span className="text-[10px] text-slate-400 uppercase font-bold block">Valor Total</span>
               <span className="text-xl font-black text-emerald-400 tracking-tight">
-                R$ {Number(amount).toFixed(2).replace(".", ",")}
+                R$ {Number(amount || 0).toFixed(2).replace(".", ",")}
               </span>
             </div>
           </div>

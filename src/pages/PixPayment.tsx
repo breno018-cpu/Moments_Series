@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, CheckCircle, Copy, Clock, Zap, ArrowLeft } from "lucide-react";
+import { Loader2, CheckCircle, Copy, Clock, Zap, ArrowLeft, QrCode } from "lucide-react";
 import { triggerHaptic } from "@/lib/haptics";
 
 interface OrderData {

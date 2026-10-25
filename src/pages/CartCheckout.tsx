@@ -57,7 +57,6 @@ export default function CartCheckout() {
       name: savedData.name || '',
       email: savedData.email || '',
       phone: savedData.phone || '',
-      cpf: savedData.cpf || '',
     }
   });
 
@@ -126,7 +125,9 @@ export default function CartCheckout() {
         const itemPrice = typeof item.price === 'number' && !isNaN(item.price) ? item.price : Number(item.price) || 0;
         const itemQty = typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
         return {
+          id: item.id,
           seriesId: item.id,
+          title: item.title,
           quantity: itemQty,
           price: itemPrice,
         };
@@ -146,8 +147,11 @@ export default function CartCheckout() {
 
       const utms = captureUtms();
       const landing = captureLandingAndReferrer();
+      const firstSeriesId = items[0]?.id;
+
       const { data: result, error } = await supabase.functions.invoke('create-pix-payment', {
         body: {
+          seriesId: firstSeriesId,
           items: cartItems,
           totalAmount: total,
           customerName: data.name,
@@ -170,7 +174,6 @@ export default function CartCheckout() {
         name: data.name,
         email: data.email,
         phone: data.phone,
-        cpf: data.cpf
       }));
       clearCart();
 
