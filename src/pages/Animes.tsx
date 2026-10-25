@@ -63,9 +63,25 @@ const Row = ({
   if (items.length === 0) return null;
 
   const scroll = (dir: "left" | "right") => {
-    if (!ref.current) return;
-    const amount = ref.current.clientWidth * 0.85;
-    ref.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+    const el = ref.current;
+    if (!el) return;
+    const amount = Math.max(el.clientWidth * 0.75, 240);
+    const isAtEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 15;
+    const isAtStart = el.scrollLeft <= 10;
+
+    if (dir === "right") {
+      if (isAtEnd) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: amount, behavior: "smooth" });
+      }
+    } else {
+      if (isAtStart) {
+        el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: -amount, behavior: "smooth" });
+      }
+    }
   };
 
   if (!items || items.length === 0) return null;
@@ -83,31 +99,46 @@ const Row = ({
               ({items.length})
             </span>
           </h2>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              aria-label="Rotacionar para a esquerda"
+              className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border border-white/15 bg-white/10 hover:bg-white/20 active:scale-90 flex items-center justify-center text-white shadow-md transition-all cursor-pointer"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              aria-label="Rotacionar para a direita"
+              className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border border-white/15 bg-white/10 hover:bg-white/20 active:scale-90 flex items-center justify-center text-white shadow-md transition-all cursor-pointer"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="relative">
-          {canLeft && (
-            <button
-              onClick={() => scroll("left")}
-              className="hidden sm:flex absolute left-0 top-0 bottom-2 z-10 items-center justify-center w-12 bg-gradient-to-r from-background via-background/80 to-transparent transition-opacity"
-              aria-label="Anterior"
-            >
-              <span className="bg-background/90 backdrop-blur-md rounded-full p-2 shadow-xl border border-border hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all">
-                <ChevronLeft className="h-4 w-4" />
-              </span>
-            </button>
-          )}
-          {canRight && (
-            <button
-              onClick={() => scroll("right")}
-              className="hidden sm:flex absolute right-0 top-0 bottom-2 z-10 items-center justify-center w-12 bg-gradient-to-l from-background via-background/80 to-transparent transition-opacity"
-              aria-label="Próximo"
-            >
-              <span className="bg-background/90 backdrop-blur-md rounded-full p-2 shadow-xl border border-border hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all">
-                <ChevronRight className="h-4 w-4" />
-              </span>
-            </button>
-          )}
+        <div className="relative group/track">
+          {/* Seta lateral esquerda */}
+          <button
+            type="button"
+            onClick={() => scroll("left")}
+            aria-label="Voltar no catálogo de animes"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-10 w-8 sm:h-12 sm:w-10 bg-black/80 hover:bg-black/95 text-white rounded-r-xl flex items-center justify-center border-y border-r border-white/20 backdrop-blur-sm shadow-2xl active:scale-95 transition-all opacity-80 hover:opacity-100 cursor-pointer"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          {/* Seta lateral direita */}
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            aria-label="Avançar no catálogo de animes"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-10 w-8 sm:h-12 sm:w-10 bg-black/80 hover:bg-black/95 text-white rounded-l-xl flex items-center justify-center border-y border-l border-white/20 backdrop-blur-sm shadow-2xl active:scale-95 transition-all opacity-80 hover:opacity-100 cursor-pointer"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
 
           <div
             ref={ref}

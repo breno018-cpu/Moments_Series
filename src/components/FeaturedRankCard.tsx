@@ -72,10 +72,29 @@ const FeaturedRankCardComponent = ({
     }
   };
 
+  const [pointerDownPos, setPointerDownPos] = useState<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setPointerDownPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (pointerDownPos) {
+      const dx = Math.abs(e.clientX - pointerDownPos.x);
+      const dy = Math.abs(e.clientY - pointerDownPos.y);
+      if (dx > 8 || dy > 8) {
+        // O usuário estava arrastando/rolando o Top 10. Não abre modal.
+        return;
+      }
+    }
+    handleOpenModal();
+  };
+
   return (
     <>
       <div
-        onClick={handleOpenModal}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
         className="group relative flex items-end cursor-pointer select-none transition-all duration-300 hover:-translate-y-2 py-2"
       >
         {/* Número do Rank estilo Netflix Top 10 (Gigante com profundidade 3D) */}

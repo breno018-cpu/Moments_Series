@@ -74,11 +74,30 @@ const SeriesCardComponent = ({
     }
   };
 
+  const [pointerDownPos, setPointerDownPos] = useState<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    setPointerDownPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (pointerDownPos) {
+      const dx = Math.abs(e.clientX - pointerDownPos.x);
+      const dy = Math.abs(e.clientY - pointerDownPos.y);
+      if (dx > 8 || dy > 8) {
+        // O usuário estava arrastando/rolando horizontalmente o catálogo. Não abre modal.
+        return;
+      }
+    }
+    handleOpenModal();
+  };
+
   return (
     <>
       <div
-        onClick={handleOpenModal}
-        className="group block cursor-pointer select-none card-content-visibility"
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        className="group block cursor-pointer select-none"
       >
         {/* Poster — ultraleve e sem cortes, alinhado à proporção real 3:4 das capas */}
         <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted/80 ring-1 ring-white/10 group-hover:ring-purple-500/50 transition-colors duration-200">

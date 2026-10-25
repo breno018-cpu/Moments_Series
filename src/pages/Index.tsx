@@ -38,37 +38,34 @@ const RowComponent = ({
   newyearActive,
 }: RowProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canLeft, setCanLeft] = useState(false);
-  const [canRight, setCanRight] = useState(true);
 
   // Limita a 24 itens na linha horizontal para fluidez total de 120fps no iOS/Safari
   const displayItems = useMemo(() => (items ? items.slice(0, 24) : []), [items]);
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const update = () => {
-      setCanLeft(el.scrollLeft > 8);
-      setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 8);
-    };
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      el.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [displayItems.length]);
-
   if (!items || items.length === 0) return null;
 
   const scroll = (dir: "left" | "right") => {
-    if (!scrollRef.current) return;
-    const amount = scrollRef.current.clientWidth * 0.85;
-    scrollRef.current.scrollBy({
-      left: dir === "left" ? -amount : amount,
-      behavior: "smooth",
-    });
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = Math.max(el.clientWidth * 0.75, 240);
+    const isAtEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 15;
+    const isAtStart = el.scrollLeft <= 10;
+
+    if (dir === "right") {
+      if (isAtEnd) {
+        // Rotaciona de volta para o começo
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: amount, behavior: "smooth" });
+      }
+    } else {
+      if (isAtStart) {
+        // Rotaciona para o final
+        el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+      } else {
+        el.scrollBy({ left: -amount, behavior: "smooth" });
+      }
+    }
   };
 
   return (
@@ -83,33 +80,46 @@ const RowComponent = ({
               {items.length}
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
+              type="button"
               onClick={() => scroll("left")}
-              disabled={!canLeft}
-              aria-label="Anterior"
-              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-white/10 bg-white/5 backdrop-blur flex items-center justify-center text-foreground/80 hover:text-foreground hover:bg-white/15 hover:border-white/20 active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
+              aria-label="Rotacionar para a esquerda"
+              className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border border-white/15 bg-white/10 hover:bg-white/20 active:scale-90 flex items-center justify-center text-white shadow-md transition-all cursor-pointer"
             >
-              <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </button>
             <button
+              type="button"
               onClick={() => scroll("right")}
-              disabled={!canRight}
-              aria-label="Próximo"
-              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-white/10 bg-white/5 backdrop-blur flex items-center justify-center text-foreground/80 hover:text-foreground hover:bg-white/15 hover:border-white/20 active:scale-95 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-200"
+              aria-label="Rotacionar para a direita"
+              className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border border-white/15 bg-white/10 hover:bg-white/20 active:scale-90 flex items-center justify-center text-white shadow-md transition-all cursor-pointer"
             >
-              <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        <div className="relative">
-          {canLeft && (
-            <div className="hidden sm:block pointer-events-none absolute left-0 top-0 bottom-2 w-12 bg-gradient-to-r from-background to-transparent z-[1]" />
-          )}
-          {canRight && (
-            <div className="hidden sm:block pointer-events-none absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background to-transparent z-[1]" />
-          )}
+        <div className="relative group/track">
+          {/* Seta lateral flutuante esquerda para rotação fácil */}
+          <button
+            type="button"
+            onClick={() => scroll("left")}
+            aria-label="Voltar no catálogo"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-10 w-8 sm:h-12 sm:w-10 bg-black/80 hover:bg-black/95 text-white rounded-r-xl flex items-center justify-center border-y border-r border-white/20 backdrop-blur-sm shadow-2xl active:scale-95 transition-all opacity-80 hover:opacity-100 cursor-pointer"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          {/* Seta lateral flutuante direita para rotação fácil */}
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            aria-label="Avançar no catálogo"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-10 w-8 sm:h-12 sm:w-10 bg-black/80 hover:bg-black/95 text-white rounded-l-xl flex items-center justify-center border-y border-l border-white/20 backdrop-blur-sm shadow-2xl active:scale-95 transition-all opacity-80 hover:opacity-100 cursor-pointer"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
 
           <div
             ref={scrollRef}
@@ -143,6 +153,22 @@ const Index = () => {
   const searchQuery = searchParams.get("search") || "";
   const [selectedGenre, setSelectedGenre] = useState("Todos");
   const [quickFilter, setQuickFilter] = useState<FilterCategory>("all");
+  const top10ScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollTop10 = (dir: "left" | "right") => {
+    const el = top10ScrollRef.current;
+    if (!el) return;
+    const amount = Math.max(el.clientWidth * 0.75, 260);
+    const isAtEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 15;
+    const isAtStart = el.scrollLeft <= 10;
+    if (dir === "right") {
+      if (isAtEnd) el.scrollTo({ left: 0, behavior: "smooth" });
+      else el.scrollBy({ left: amount, behavior: "smooth" });
+    } else {
+      if (isAtStart) el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+      else el.scrollBy({ left: -amount, behavior: "smooth" });
+    }
+  };
 
   usePageView();
 
@@ -501,15 +527,56 @@ const Index = () => {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-amber-300 font-bold bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/20 self-start sm:self-auto">
-                        <Trophy className="w-4 h-4 text-amber-400" />
-                        Atualizado em tempo real
+                      <div className="flex items-center gap-2 self-start sm:self-auto">
+                        <div className="flex items-center gap-2 text-xs text-amber-300 font-bold bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/20">
+                          <Trophy className="w-4 h-4 text-amber-400" />
+                          Atualizado em tempo real
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => scrollTop10("left")}
+                            aria-label="Voltar no Top 10"
+                            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border border-amber-500/30 bg-amber-500/15 hover:bg-amber-500/30 active:scale-90 flex items-center justify-center text-amber-300 transition-all cursor-pointer shadow-md"
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => scrollTop10("right")}
+                            aria-label="Avançar no Top 10"
+                            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full border border-amber-500/30 bg-amber-500/15 hover:bg-amber-500/30 active:scale-90 flex items-center justify-center text-amber-300 transition-all cursor-pointer shadow-md"
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                     
                     {/* Carrossel Horizontal Expandido com cards gigantes e números Top 10 */}
-                    <div className="relative z-10">
+                    <div className="relative z-10 group/top10">
+                      {/* Seta lateral flutuante esquerda */}
+                      <button
+                        type="button"
+                        onClick={() => scrollTop10("left")}
+                        aria-label="Voltar no Top 10"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 h-11 w-8 sm:h-14 sm:w-10 bg-black/80 hover:bg-black/95 text-amber-300 rounded-r-xl flex items-center justify-center border-y border-r border-amber-500/30 backdrop-blur-sm shadow-2xl active:scale-95 transition-all opacity-80 hover:opacity-100 cursor-pointer"
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+
+                      {/* Seta lateral flutuante direita */}
+                      <button
+                        type="button"
+                        onClick={() => scrollTop10("right")}
+                        aria-label="Avançar no Top 10"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 h-11 w-8 sm:h-14 sm:w-10 bg-black/80 hover:bg-black/95 text-amber-300 rounded-l-xl flex items-center justify-center border-y border-l border-amber-500/30 backdrop-blur-sm shadow-2xl active:scale-95 transition-all opacity-80 hover:opacity-100 cursor-pointer"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+
                       <div
+                        ref={top10ScrollRef}
                         style={{ WebkitOverflowScrolling: 'touch' }}
                         className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 pt-2 touch-pan-x scroll-smooth"
                       >
