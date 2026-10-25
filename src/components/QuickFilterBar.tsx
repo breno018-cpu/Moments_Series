@@ -33,7 +33,10 @@ export const QuickFilterBar: React.FC<QuickFilterBarProps> = ({
   return (
     <div className="w-full py-3 mb-6">
       <div className="app-container">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1 touch-pan-x">
+        <div
+          className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1 overscroll-x-contain"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y' }}
+        >
           {FILTER_ITEMS.map((item) => {
             const isActive = activeFilter === item.id;
             const count = counts ? counts[item.id] : undefined;

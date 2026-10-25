@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Anime } from "@/hooks/useAnimes";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
-import { useState, memo, useEffect } from "react";
+import { useState, memo, useEffect, useRef } from "react";
 import placeholderImage from "@/assets/series-1.jpg";
 import { optimizedImage } from "@/lib/image";
 import { WishlistButton } from "@/components/WishlistButton";
@@ -66,18 +66,20 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
     }
   };
 
-  const [pointerDownPos, setPointerDownPos] = useState<{ x: number; y: number } | null>(null);
+  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    setPointerDownPos({ x: e.clientX, y: e.clientY });
+    pointerDownPos.current = { x: e.clientX, y: e.clientY, time: Date.now() };
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    if (pointerDownPos) {
-      const dx = Math.abs(e.clientX - pointerDownPos.x);
-      const dy = Math.abs(e.clientY - pointerDownPos.y);
-      if (dx > 8 || dy > 8) {
-        // O usuário estava arrastando/rolando horizontalmente. Não abre modal.
+    if (pointerDownPos.current) {
+      const dx = Math.abs(e.clientX - pointerDownPos.current.x);
+      const dy = Math.abs(e.clientY - pointerDownPos.current.y);
+      const dt = Date.now() - pointerDownPos.current.time;
+      pointerDownPos.current = null;
+      if (dx > 6 || dy > 6 || dt > 500) {
+        // O usuário estava rolando a página ou arrastando o catálogo. Não abre modal.
         return;
       }
     }

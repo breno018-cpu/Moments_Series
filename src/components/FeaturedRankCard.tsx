@@ -1,4 +1,4 @@
-import { useState, useMemo, memo, useEffect } from "react";
+import { useState, useMemo, memo, useEffect, useRef } from "react";
 import { Star, Plus, Play, Flame, TrendingUp } from "lucide-react";
 import { Series } from "@/hooks/useSeries";
 import { useCart } from "@/hooks/useCart";
@@ -72,18 +72,20 @@ const FeaturedRankCardComponent = ({
     }
   };
 
-  const [pointerDownPos, setPointerDownPos] = useState<{ x: number; y: number } | null>(null);
+  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    setPointerDownPos({ x: e.clientX, y: e.clientY });
+    pointerDownPos.current = { x: e.clientX, y: e.clientY, time: Date.now() };
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
-    if (pointerDownPos) {
-      const dx = Math.abs(e.clientX - pointerDownPos.x);
-      const dy = Math.abs(e.clientY - pointerDownPos.y);
-      if (dx > 8 || dy > 8) {
-        // O usuário estava arrastando/rolando o Top 10. Não abre modal.
+    if (pointerDownPos.current) {
+      const dx = Math.abs(e.clientX - pointerDownPos.current.x);
+      const dy = Math.abs(e.clientY - pointerDownPos.current.y);
+      const dt = Date.now() - pointerDownPos.current.time;
+      pointerDownPos.current = null;
+      if (dx > 6 || dy > 6 || dt > 500) {
+        // O usuário estava rolando a página ou arrastando o Top 10. Não abre modal.
         return;
       }
     }

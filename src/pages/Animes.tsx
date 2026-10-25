@@ -142,7 +142,11 @@ const Row = ({
 
           <div
             ref={ref}
-            className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-3"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-x pan-y',
+            }}
+            className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-3 overscroll-x-contain"
           >
             {items.map((a) => (
               <div
