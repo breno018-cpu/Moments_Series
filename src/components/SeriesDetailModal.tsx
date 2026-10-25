@@ -43,24 +43,24 @@ export function SeriesDetailModal({ series, isOpen, onClose, itemType = 'series'
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[94vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0c0d14] border-white/10 text-white p-0 rounded-2xl shadow-2xl">
-        <div className="relative aspect-video w-full overflow-hidden bg-black">
+      <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden bg-[#0c0d14] border-white/10 text-white p-0 gap-0 rounded-2xl shadow-2xl">
+        <div className="relative aspect-video w-full overflow-hidden bg-black select-none">
           <img
             src={series.image_url ? optimizedImage(series.image_url, { width: 720, quality: 75 }) : 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=720&q=75&auto=format&fit=crop'}
             alt={series.title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14] via-[#0c0d14]/40 to-transparent" />
-          <WishlistButton itemId={series.id} itemType={itemType} className="absolute top-4 right-12" />
+          <WishlistButton itemId={series.id} itemType={itemType} className="absolute top-3 right-12 z-10" />
         </div>
 
-        <div className="p-6 space-y-4">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-black tracking-tight">{series.title}</h2>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+        <div className="p-4 sm:p-6 space-y-4 w-full min-w-0 max-w-full overflow-x-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 w-full min-w-0">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl font-black tracking-tight break-words text-white">{series.title}</h2>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1.5 flex-wrap">
                 <StarRating
                   rating={ratingStats?.average ?? seriesRating}
                   readonly
@@ -69,25 +69,25 @@ export function SeriesDetailModal({ series, isOpen, onClose, itemType = 'series'
                   count={ratingStats?.count}
                 />
                 <span>·</span>
-                <span>{series.genre}</span>
+                <span className="truncate">{series.genre}</span>
                 <span>·</span>
                 <span>{series.year || 2024}</span>
                 <span>·</span>
                 <span className="uppercase">{series.audio_type || 'Dublado'}</span>
               </div>
             </div>
-            <div className="text-right">
+            <div className="sm:text-right flex items-baseline sm:flex-col justify-between sm:justify-start gap-1 flex-shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-white/5">
               <span className="text-xs text-muted-foreground">Acesso Vitalício</span>
-              <div className="text-xl font-black text-purple-400">R$ {price.toFixed(2)}</div>
+              <div className="text-xl sm:text-2xl font-black text-purple-400">R$ {price.toFixed(2)}</div>
             </div>
           </div>
 
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed break-words">
             {series.description || series.long_description || "Acompanhe essa produção imperdível disponível em alta definição com áudio original e dublado."}
           </p>
 
           {/* Mini-box de avaliação direta */}
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5 text-xs">
+          <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-white/[0.03] border border-white/5 text-xs flex-wrap">
             <span className="text-slate-300 font-medium flex items-center gap-1.5">
               <span>{ratingStats?.userRating ? "Sua nota salva:" : "Avalie este título:"}</span>
               {ratingStats?.userRating && (
@@ -102,7 +102,7 @@ export function SeriesDetailModal({ series, isOpen, onClose, itemType = 'series'
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2.5 pt-4 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row gap-2.5 pt-4 border-t border-white/10 w-full min-w-0">
             <Button onClick={handleBuyNow} size="lg" className="flex-1 font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 shadow-md hover:shadow-purple-500/20">
               <Play className="w-4 h-4 mr-2 fill-current" />
               Comprar Agora
