@@ -46,6 +46,7 @@ export const useAdmin = () => {
         return { isAdmin: false, email: '' };
       }
 
+      // 1. Tentar ler diretamente da tabela user_roles
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -53,13 +54,27 @@ export const useAdmin = () => {
         .eq('role', 'admin')
         .maybeSingle();
 
-      if (error) {
+      let isAdmin = !!data;
+
+      // 2. Fallback resiliente: caso a tabela user_roles falhe ou retorne vazio devido a RLS, chamar a RPC is_admin
+      if (!isAdmin) {
+        try {
+          const { data: rpcIsAdmin } = await supabase.rpc('is_admin', {
+            user_id: currentSession.user.id,
+          });
+          if (rpcIsAdmin === true) {
+            isAdmin = true;
+          }
+        } catch (rpcErr) {
+          console.warn('[useAdmin] RPC is_admin check fallback:', rpcErr);
+        }
+      }
+
+      if (error && !isAdmin) {
         console.error('Erro ao verificar status de admin:', error);
         const wasAdmin = typeof window !== 'undefined' && sessionStorage.getItem('moments_admin_session') === 'true';
         return { isAdmin: wasAdmin, email: currentSession.user.email || '' };
       }
-
-      const isAdmin = !!data;
       if (isAdmin) {
         sessionStorage.setItem('moments_admin_session', 'true');
       } else {

@@ -78,7 +78,7 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // Verificar se é admin
+      // Verificar se é admin (via tabela user_roles com fallback na RPC is_admin)
       const { data: roleData } = await supabase
         .from("user_roles")
         .select("role")
@@ -86,7 +86,22 @@ export default function Auth() {
         .eq("role", "admin")
         .maybeSingle();
 
-      if (!roleData) {
+      let isAuthorized = !!roleData;
+
+      if (!isAuthorized) {
+        try {
+          const { data: rpcIsAdmin } = await supabase.rpc("is_admin", {
+            user_id: data.user.id,
+          });
+          if (rpcIsAdmin === true) {
+            isAuthorized = true;
+          }
+        } catch (rpcErr) {
+          console.warn("[Auth] RPC is_admin check fallback:", rpcErr);
+        }
+      }
+
+      if (!isAuthorized) {
         await supabase.auth.signOut();
         toast.error("Acesso restrito. Sua conta não tem permissões administrativas.");
         return;
