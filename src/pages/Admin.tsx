@@ -94,11 +94,14 @@ export default function Admin() {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
+    } catch {
+      // ignore
+    } finally {
       sessionStorage.removeItem('moments_admin_session');
+      localStorage.removeItem('moments_admin_session');
+      localStorage.removeItem('moments_admin_email');
       toast.success('Logout realizado com sucesso');
       handleTransitionNavigate('/');
-    } catch {
-      navigate('/');
     }
   };
 

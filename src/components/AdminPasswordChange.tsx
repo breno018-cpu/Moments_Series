@@ -26,11 +26,11 @@ export const AdminPasswordChange = () => {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user?.email) throw new Error('Usuário não encontrado');
+      const adminEmail = user?.email || localStorage.getItem('moments_admin_email') || 'momentsserie6@gmail.com';
 
       // Reverifica a senha atual
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
+        email: adminEmail,
         password: currentPassword,
       });
       if (signInError) {

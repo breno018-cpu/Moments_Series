@@ -19,15 +19,18 @@ export function AdminHeader({ onNavigateTransition }: { onNavigateTransition?: (
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
+    } catch (e) {
+      console.warn("Sign out error:", e);
+    } finally {
       sessionStorage.removeItem("moments_admin_session");
+      localStorage.removeItem("moments_admin_session");
+      localStorage.removeItem("moments_admin_email");
       toast.success("Sessão encerrada com sucesso");
       if (onNavigateTransition) {
-        onNavigateTransition("/");
+        onNavigateTransition("/auth");
       } else {
-        navigate("/");
+        navigate("/auth");
       }
-    } catch {
-      navigate("/");
     }
   };
 
@@ -59,7 +62,7 @@ export function AdminHeader({ onNavigateTransition }: { onNavigateTransition?: (
             variant="ghost"
             size="sm"
             onClick={handleGoToSite}
-            className="h-9 px-3 text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 gap-1.5 rounded-lg border border-zinc-200/80 shadow-xs"
+            className="h-9 px-3 text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 gap-1.5 rounded-lg border border-zinc-200/80 shadow-xs cursor-pointer"
             title="Ir para a loja pública"
           >
             <ExternalLink className="w-3.5 h-3.5" />
@@ -70,7 +73,7 @@ export function AdminHeader({ onNavigateTransition }: { onNavigateTransition?: (
             variant="ghost"
             size="sm"
             onClick={handleLogout}
-            className="h-9 px-3 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 gap-1.5 rounded-lg border border-rose-200"
+            className="h-9 px-3 text-xs font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 gap-1.5 rounded-lg border border-rose-200 cursor-pointer"
             title="Encerrar sessão administrativa"
           >
             <LogOut className="w-3.5 h-3.5" />
