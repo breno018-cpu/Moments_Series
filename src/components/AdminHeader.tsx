@@ -46,7 +46,9 @@ export function AdminHeader({ onNavigateTransition }: { onNavigateTransition?: (
             <img 
               src={pixelloomLogo} 
               alt="PixelLoom Studios" 
-              className="h-6 w-auto opacity-95 group-hover:opacity-100 transition-opacity" 
+              width={120}
+              height={24}
+              className="h-6 w-auto max-w-[140px] opacity-95 group-hover:opacity-100 transition-opacity object-contain" 
             />
           </div>
           <span className="h-4 w-px bg-zinc-200 hidden sm:block" />

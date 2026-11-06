@@ -284,7 +284,7 @@ export default function Auth() {
           </div>
 
           <div className="inline-flex items-center gap-2.5 bg-white/80 backdrop-blur-md border border-zinc-200/90 px-3.5 py-1.5 rounded-full shadow-xs">
-            <img src={pixelloomLogo} alt="PixelLoom Studios" className="h-5 sm:h-6 w-auto" />
+            <img src={pixelloomLogo} alt="PixelLoom Studios" width={120} height={24} className="h-5 sm:h-6 w-auto max-w-[130px] object-contain" />
           </div>
         </header>
 
@@ -294,11 +294,13 @@ export default function Auth() {
             <div className="h-1.5 w-full bg-gradient-to-r from-zinc-950 via-[#E31C25] to-zinc-950" />
 
             <CardHeader className="pt-6 pb-3 text-center">
-              <div className="mx-auto mb-3 flex items-center justify-center">
+              <div className="mx-auto mb-3 w-12 h-12 flex items-center justify-center">
                 <img
                   src={pixelloomIcon}
                   alt="PixelLoom"
-                  className="w-13 h-13 rounded-2xl shadow-md ring-1 ring-black/10 transition-transform hover:scale-105 duration-300"
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 max-w-[48px] max-h-[48px] rounded-2xl shadow-md ring-1 ring-black/10 object-contain transition-transform hover:scale-105 duration-300"
                 />
               </div>
 
