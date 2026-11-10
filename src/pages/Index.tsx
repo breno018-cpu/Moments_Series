@@ -123,9 +123,7 @@ const RowComponent = ({
 
           <div
             ref={scrollRef}
-            style={{
-              WebkitOverflowScrolling: 'touch',
-                          }}
+            style={{ WebkitOverflowScrolling: 'touch' }}
             className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide pb-2 overscroll-x-contain"
           >
             {displayItems.map((s) => (
@@ -579,9 +577,7 @@ const Index = () => {
 
                       <div
                         ref={top10ScrollRef}
-                        style={{
-                          WebkitOverflowScrolling: 'touch',
-                                                  }}
+                        style={{ WebkitOverflowScrolling: 'touch' }}
                         className="flex gap-4 sm:gap-6 overflow-x-auto scrollbar-hide pb-4 pt-2 overscroll-x-contain"
                       >
                         {featured.map((s, idx) => (
