@@ -43,7 +43,7 @@ export function SeriesDetailModal({ series, isOpen, onClose, itemType = 'series'
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden bg-[#0c0d14] border-white/10 text-white p-0 gap-0 rounded-2xl shadow-2xl">
+      <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[min(90dvh,85vh)] overflow-y-auto overflow-x-hidden overscroll-contain bg-[#0c0d14] border-white/10 text-white p-0 gap-0 rounded-2xl shadow-2xl">
         <div className="relative aspect-video w-full overflow-hidden bg-black select-none">
           <img
             src={series.image_url ? optimizedImage(series.image_url, { width: 720, quality: 75 }) : 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=720&q=75&auto=format&fit=crop'}
@@ -59,7 +59,12 @@ export function SeriesDetailModal({ series, isOpen, onClose, itemType = 'series'
         <div className="p-4 sm:p-6 space-y-4 w-full min-w-0 max-w-full overflow-x-hidden">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4 w-full min-w-0">
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight break-words text-white">{series.title}</h2>
+              <DialogTitle className="text-xl sm:text-2xl font-black tracking-tight break-words text-white">
+                {series.title}
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                {series.description || series.title}
+              </DialogDescription>
               <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1.5 flex-wrap">
                 <StarRating
                   rating={ratingStats?.average ?? seriesRating}

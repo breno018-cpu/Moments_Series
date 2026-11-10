@@ -20,6 +20,7 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
   const [imgSrc, setImgSrc] = useState(rawImageUrl ? optimizedImage(rawImageUrl, { width: 360, quality: 75 }) : placeholderImage);
   const [imgError, setImgError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
 
   useEffect(() => {
     if (rawImageUrl) {
@@ -30,15 +31,14 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
     }
   }, [rawImageUrl]);
 
-  if (!anime || !anime.id) return null;
-
-  const price = typeof anime.price === 'number' ? anime.price : Number(anime.price) || 0;
-  const rating = typeof anime.rating === 'number' ? anime.rating : Number(anime.rating) || 0;
-  const year = anime.year || 0;
+  const price = typeof anime?.price === 'number' ? anime.price : Number(anime?.price) || 0;
+  const rating = typeof anime?.rating === 'number' ? anime.rating : Number(anime?.rating) || 0;
+  const year = anime?.year || 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!anime) return;
     addItem({
       id: anime.id,
       title: anime.title,
@@ -66,8 +66,6 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
     }
   };
 
-  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
-
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerDownPos.current = { x: e.clientX, y: e.clientY, time: Date.now() };
   };
@@ -78,13 +76,14 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
       const dy = Math.abs(e.clientY - pointerDownPos.current.y);
       const dt = Date.now() - pointerDownPos.current.time;
       pointerDownPos.current = null;
-      if (dx > 6 || dy > 6 || dt > 500) {
-        // O usuário estava rolando a página ou arrastando o catálogo. Não abre modal.
+      if (dx > 10 || dy > 10 || dt > 450) {
         return;
       }
     }
     setIsModalOpen(true);
   };
+
+  if (!anime || !anime.id) return null;
 
   return (
     <>

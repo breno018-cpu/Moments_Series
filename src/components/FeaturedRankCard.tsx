@@ -29,6 +29,7 @@ const FeaturedRankCardComponent = ({
   const [imgSrc, setImgSrc] = useState(rawImageUrl ? optimizedImage(rawImageUrl, { width: 360, quality: 75 }) : placeholderImage);
   const [imgError, setImgError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
 
   useEffect(() => {
     if (rawImageUrl) {
@@ -45,15 +46,14 @@ const FeaturedRankCardComponent = ({
     [seriesId, itemType]
   );
 
-  if (!series || !series.id) return null;
-
-  const price = typeof series.price === 'number' ? series.price : Number(series.price) || 0;
-  const rating = typeof series.rating === 'number' ? series.rating : Number(series.rating) || 4.9;
-  const year = series.year || 2024;
+  const price = typeof series?.price === 'number' ? series.price : Number(series?.price) || 0;
+  const rating = typeof series?.rating === 'number' ? series.rating : Number(series?.rating) || 4.9;
+  const year = series?.year || 2024;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!series) return;
     triggerHaptic('success');
     addItem(series);
     toast.success("Adicionado à sua lista");
@@ -72,8 +72,6 @@ const FeaturedRankCardComponent = ({
     }
   };
 
-  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
-
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerDownPos.current = { x: e.clientX, y: e.clientY, time: Date.now() };
   };
@@ -84,13 +82,14 @@ const FeaturedRankCardComponent = ({
       const dy = Math.abs(e.clientY - pointerDownPos.current.y);
       const dt = Date.now() - pointerDownPos.current.time;
       pointerDownPos.current = null;
-      if (dx > 6 || dy > 6 || dt > 500) {
-        // O usuário estava rolando a página ou arrastando o Top 10. Não abre modal.
+      if (dx > 10 || dy > 10 || dt > 450) {
         return;
       }
     }
     handleOpenModal();
   };
+
+  if (!series || !series.id) return null;
 
   return (
     <>

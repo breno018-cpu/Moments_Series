@@ -175,9 +175,8 @@ export default function CartCheckout() {
         email: data.email,
         phone: data.phone,
       }));
-      clearCart();
 
-      // Ativa o Checkout Transparente na mesma tela
+      // Ativa o Checkout Transparente na mesma tela sem esvaziar o carrinho prematuramente
       setInlinePix({
         open: true,
         orderId: result.orderId,
@@ -208,7 +207,7 @@ export default function CartCheckout() {
     }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !inlinePix.open) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -513,6 +512,7 @@ export default function CartCheckout() {
         amount={total}
         itemTitle="Itens do Carrinho"
         onSuccess={(oId, oToken) => {
+          clearCart();
           navigate(`/purchase-success?order_id=${oId}&token=${oToken}`);
         }}
       />

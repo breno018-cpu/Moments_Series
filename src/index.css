@@ -188,7 +188,6 @@
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1, "cv11" 1;
     letter-spacing: -0.011em;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;

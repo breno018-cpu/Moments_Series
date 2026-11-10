@@ -12,6 +12,7 @@ import { wa } from "@/lib/whatsapp.client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { DEFAULT_SALES_TEMPLATE } from "@/components/AdminWhatsAppMessageSettings";
 import { logWhatsAppDispatch } from "@/lib/whatsappLogs";
+import placeholderImage from "@/assets/series-1.jpg";
 
 interface Purchase {
   id: string;
@@ -396,7 +397,7 @@ export default function PurchaseSuccess() {
                 <div className="flex flex-col md:flex-row gap-6 p-6">
                   <div className="relative group shrink-0">
                     <img
-                      src={purchase.series.image ? optimizedImage(purchase.series.image, { width: 360, quality: 75 }) : ''}
+                      src={purchase.series.image ? optimizedImage(purchase.series.image, { width: 360, quality: 75 }) : placeholderImage}
                       alt={purchase.series.title}
                       loading="lazy"
                       decoding="async"

@@ -34,6 +34,7 @@ const SeriesCardComponent = ({
   const [imgSrc, setImgSrc] = useState(rawImageUrl ? optimizedImage(rawImageUrl, { width: 360, quality: 75 }) : placeholderImage);
   const [imgError, setImgError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
 
   useEffect(() => {
     if (rawImageUrl) {
@@ -47,15 +48,14 @@ const SeriesCardComponent = ({
   const seriesId = series?.id || '';
   const salesMetric = useMemo(() => getDynamicSalesMetric(seriesId, Boolean(series?.featured), itemType), [seriesId, series?.featured, itemType]);
 
-  if (!series || !series.id) return null;
-
-  const price = typeof series.price === 'number' ? series.price : Number(series.price) || 0;
-  const rating = typeof series.rating === 'number' ? series.rating : Number(series.rating) || 0;
-  const year = series.year || 0;
+  const price = typeof series?.price === 'number' ? series.price : Number(series?.price) || 0;
+  const rating = typeof series?.rating === 'number' ? series.rating : Number(series?.rating) || 0;
+  const year = series?.year || 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!series) return;
     triggerHaptic('success');
     addItem(series);
     toast.success("Adicionado à sua lista");
@@ -74,8 +74,6 @@ const SeriesCardComponent = ({
     }
   };
 
-  const pointerDownPos = useRef<{ x: number; y: number; time: number } | null>(null);
-
   const handlePointerDown = (e: React.PointerEvent) => {
     pointerDownPos.current = { x: e.clientX, y: e.clientY, time: Date.now() };
   };
@@ -86,13 +84,15 @@ const SeriesCardComponent = ({
       const dy = Math.abs(e.clientY - pointerDownPos.current.y);
       const dt = Date.now() - pointerDownPos.current.time;
       pointerDownPos.current = null;
-      if (dx > 6 || dy > 6 || dt > 500) {
-        // O usuário estava rolando a página ou arrastando o catálogo. Não abre modal.
+      // Se moveu mais de 10px ou demorou mais de 450ms, o usuário estava rolando a página
+      if (dx > 10 || dy > 10 || dt > 450) {
         return;
       }
     }
     handleOpenModal();
   };
+
+  if (!series || !series.id) return null;
 
   return (
     <>
