@@ -335,7 +335,7 @@ export default function Auth() {
                       <Input
                         id="email"
                         type="email"
-                        placeholder="momentsserie6@gmail.com"
+                        placeholder="admin@exemplo.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
@@ -395,7 +395,7 @@ export default function Auth() {
                         Acesso de Emergência / Master
                       </div>
                       <p className="text-[11px] text-zinc-600 leading-relaxed">
-                        Acesse diretamente com a chave mestra de segurança ou PIN de 4 dígitos (padrão: <span className="font-mono font-bold text-zinc-900">2026</span>).
+                        Acesse diretamente com a chave mestra de segurança ou PIN de 4 dígitos de administrador.
                       </p>
                     </div>
 
@@ -406,7 +406,7 @@ export default function Auth() {
                       <Input
                         id="masterKey"
                         type="password"
-                        placeholder="Digite 2026 ou sua chave mestra..."
+                        placeholder="Digite sua chave mestra ou PIN..."
                         value={masterKey}
                         onChange={(e) => setMasterKey(e.target.value)}
                         disabled={isLoading}
