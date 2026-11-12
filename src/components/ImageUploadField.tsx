@@ -132,7 +132,7 @@ export function ImageUploadField({
               type="button"
               onClick={() => onChange('')}
               title="Remover capa"
-              className="absolute top-1 right-1 bg-black/70 hover:bg-rose-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-1 right-1 bg-black/75 hover:bg-rose-600 active:bg-rose-700 text-white rounded-full p-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity touch-manipulation cursor-pointer"
             >
               <X className="h-2.5 w-2.5" />
             </button>

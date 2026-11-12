@@ -35,7 +35,7 @@ export function AdminHeader({ onNavigateTransition }: { onNavigateTransition?: (
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 bg-white/90 backdrop-blur-xl shadow-xs transition-colors">
+    <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 bg-white/90 backdrop-blur-xl shadow-xs transition-colors pt-[env(safe-area-inset-top,0px)]">
       <div className="app-container h-16 flex items-center justify-between gap-4">
         {/* Identidade PixelLoom Admin */}
         <div className="flex items-center gap-3">

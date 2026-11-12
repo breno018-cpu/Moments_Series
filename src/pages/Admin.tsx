@@ -236,7 +236,7 @@ export default function Admin() {
     <div className="admin-theme min-h-screen bg-[#fbfbfd] text-zinc-950 relative overflow-x-hidden">
       <AdminHeader onNavigateTransition={handleTransitionNavigate} />
 
-      <main className="app-container py-4 sm:py-6 mt-1 relative z-10 max-w-7xl">
+      <main className="app-container py-4 sm:py-6 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] mt-1 relative z-10 max-w-7xl">
         
         {/* Cabeçalho Limpo e Compacto */}
         <div className="relative rounded-2xl border border-zinc-200/90 bg-white p-5 sm:p-6 mb-6 shadow-xs">
@@ -265,7 +265,7 @@ export default function Admin() {
                     Nova Série
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="w-[94vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
+                <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950 ios-momentum-scroll">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-950">
                       <Sparkles className="h-5 w-5 text-purple-600" />
@@ -382,7 +382,7 @@ export default function Admin() {
         </div>
 
         {/* 5 Abas de Navegação Responsivas */}
-        <div className="flex sm:grid sm:grid-cols-5 gap-2 mb-6 overflow-x-auto pb-1 sm:pb-0 no-scrollbar -mx-1 px-1 sm:mx-0 sm:px-0">
+        <div className="flex sm:grid sm:grid-cols-5 gap-2 mb-6 overflow-x-auto pb-1 sm:pb-0 no-scrollbar -mx-1 px-1 sm:mx-0 sm:px-0 touch-pan-x ios-momentum-scroll">
           <button
             onClick={() => setActiveModule('sales')}
             className={`min-w-[140px] sm:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border text-left transition-colors flex flex-col gap-1 sm:gap-1.5 flex-shrink-0 sm:flex-shrink ${
@@ -632,7 +632,7 @@ export default function Admin() {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => handleConvert(s.id, s.title)}
-                                    className="h-8 px-2 text-[11px] border-teal-200 text-teal-700 hover:bg-teal-50 font-bold gap-1 cursor-pointer"
+                                    className="h-8 px-2 text-[11px] border-teal-200 text-teal-700 hover:bg-teal-50 font-bold gap-1 cursor-pointer touch-manipulation active:scale-95 transition-transform"
                                   >
                                     <Wand2 className="h-3 w-3" /> Anime
                                   </Button>
@@ -640,7 +640,7 @@ export default function Admin() {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => handleEdit(s)}
-                                    className="h-8 px-2.5 text-xs border-zinc-200 gap-1 hover:bg-zinc-100 text-zinc-700 font-semibold cursor-pointer"
+                                    className="h-8 px-2.5 text-xs border-zinc-200 gap-1 hover:bg-zinc-100 text-zinc-700 font-semibold cursor-pointer touch-manipulation active:scale-95 transition-transform"
                                   >
                                     <Edit className="h-3 w-3" /> Editar
                                   </Button>
@@ -648,7 +648,7 @@ export default function Admin() {
                                     variant="destructive"
                                     size="sm"
                                     onClick={() => handleDelete(s.id)}
-                                    className="h-8 px-2 text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 cursor-pointer"
+                                    className="h-8 px-2 text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 cursor-pointer touch-manipulation active:scale-95 transition-transform"
                                   >
                                     <Trash2 className="h-3 w-3" />
                                   </Button>

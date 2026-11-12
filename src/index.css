@@ -129,6 +129,28 @@
   border-color: #e4e4e7 !important;
 }
 
+/* Prevenção de Auto-Zoom do Safari no iPhone / iOS */
+@media screen and (max-width: 768px) {
+  .admin-theme input,
+  .admin-theme textarea,
+  .admin-theme select,
+  .auth-theme input,
+  .auth-theme textarea,
+  .auth-theme select {
+    font-size: 16px !important;
+  }
+}
+
+/* Suporte nativo a aceleração de toque e scroll suave no iOS Safari */
+.admin-theme {
+  -webkit-overflow-scrolling: touch;
+}
+
+.ios-momentum-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
 .admin-theme input::placeholder,
 .admin-theme textarea::placeholder,
 .auth-theme input::placeholder,

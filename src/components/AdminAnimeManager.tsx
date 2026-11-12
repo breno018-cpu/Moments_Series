@@ -134,7 +134,7 @@ export const AdminAnimeManager = () => {
               <Plus className="h-4 w-4 stroke-[3]" /> Adicionar Anime
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[94vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950">
+          <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950 ios-momentum-scroll">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-950">
                 <Sparkles className="h-5 w-5 text-teal-600" />
