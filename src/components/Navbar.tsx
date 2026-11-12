@@ -16,11 +16,13 @@ import { CommandPalette } from "./CommandPalette";
 import { cn } from "@/lib/utils";
 import { optimizedImage } from "@/lib/image";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useAdmin } from "@/hooks/useAdmin";
 import trophyImg from "@/assets/trophy.jpg";
 import ballImg from "@/assets/ball.jpg";
 
 export const Navbar = () => {
   const navigate = useNavigate();
+  const { data: adminStatus } = useAdmin();
   const { isInstalled, promptInstall } = usePWA();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -316,6 +318,18 @@ export const Navbar = () => {
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${megaOpen === "animes" ? "rotate-180" : ""}`} />
               </button>
             </div>
+
+            {/* Acesso direto ao painel para administradores */}
+            {adminStatus?.isAdmin && (
+              <Link
+                to="/admin?tab=catalog"
+                className="text-xs font-bold px-3 py-1.5 rounded-full bg-purple-600/20 text-purple-300 border border-purple-500/40 hover:bg-purple-600/30 transition-all flex items-center gap-1.5 shadow-sm ml-1"
+                title="Acessar painel e gerenciar catálogo"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Gerenciar Catálogo</span>
+              </Link>
+            )}
           </div>
 
           <div className="flex-1" />
@@ -527,6 +541,13 @@ export const Navbar = () => {
                           <Heart className="w-4 h-4 text-rose-400" /> Meus Favoritos
                         </Link>
                       </SheetClose>
+                      {adminStatus?.isAdmin && (
+                        <SheetClose asChild>
+                          <Link to="/admin?tab=catalog" className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-purple-500/15 border border-purple-500/30 text-sm font-bold text-purple-200 hover:bg-purple-500/25 transition-all">
+                            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Gerenciar Catálogo (Admin)
+                          </Link>
+                        </SheetClose>
+                      )}
                     </div>
 
                     {/* Categorias Rápidas de Séries */}

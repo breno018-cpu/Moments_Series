@@ -82,7 +82,7 @@ const FeaturedRankCardComponent = ({
       const dy = Math.abs(e.clientY - pointerDownPos.current.y);
       const dt = Date.now() - pointerDownPos.current.time;
       pointerDownPos.current = null;
-      if (dx > 10 || dy > 10 || dt > 450) {
+      if (dx > 15 || dy > 15 || dt > 800) {
         return;
       }
     }
@@ -94,6 +94,14 @@ const FeaturedRankCardComponent = ({
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleOpenModal();
+          }
+        }}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         className="group relative flex items-end cursor-pointer select-none transition-all duration-300 hover:-translate-y-2 py-2"

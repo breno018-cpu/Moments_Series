@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useSeries, useCreateSeries, useUpdateSeries, useDeleteSeries } from '@/hooks/useSeries';
@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import {
   Plus, Edit, Trash2, LogOut, Tag, BarChart3, FileText, Search,
   Film, Sparkles, Image as ImageIcon, Settings2, Wand2, ShieldCheck, Activity, Tags,
-  Target, Mail, KeyRound, Loader2, Wrench, Star, HelpCircle, TrendingUp, MessageCircle
+  Target, Mail, KeyRound, Loader2, Wrench, Star, HelpCircle, TrendingUp, MessageCircle, ChevronDown
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminDashboard } from '@/components/AdminDashboard';
@@ -39,6 +39,7 @@ import { AdminCatalogSkeleton } from '@/components/AdminCatalogSkeleton';
 
 export default function Admin() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: adminStatus, isLoading: adminLoading } = useAdmin();
   const { data: series, isLoading: seriesLoading } = useSeries();
   const isRayane = (adminStatus?.email || '').toLowerCase().includes('rayane');
@@ -51,7 +52,35 @@ export default function Admin() {
   const [searchQuery, setSearchQuery] = useState('');
   const [featuredSearchQuery, setFeaturedSearchQuery] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [activeModule, setActiveModule] = useState<'sales' | 'catalog' | 'coupons' | 'marketing' | 'settings'>('sales');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [visibleSeriesLimit, setVisibleSeriesLimit] = useState(30);
+
+  const validModules = ['sales', 'catalog', 'coupons', 'marketing', 'settings'] as const;
+  type ModuleType = typeof validModules[number];
+
+  const tabParam = searchParams.get('tab');
+  const [activeModule, setActiveModuleState] = useState<ModuleType>(() => {
+    if (tabParam && validModules.includes(tabParam as ModuleType)) {
+      return tabParam as ModuleType;
+    }
+    return 'sales';
+  });
+
+  const setActiveModule = (mod: ModuleType) => {
+    setActiveModuleState(mod);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('tab', mod);
+      return next;
+    }, { replace: true });
+  };
+
+  useEffect(() => {
+    if (tabParam && validModules.includes(tabParam as ModuleType) && tabParam !== activeModule) {
+      setActiveModuleState(tabParam as ModuleType);
+    }
+  }, [tabParam, activeModule]);
+
   const [isNavigating, setIsNavigating] = useState(false);
 
   const handleTransitionNavigate = (to: string) => {
@@ -113,41 +142,63 @@ export default function Admin() {
     setEditingId(null);
   };
 
-  const handleEdit = async (s: any) => {
+  const openNewSeriesModal = () => {
+    resetForm();
+    setIsDialogOpen(true);
+  };
+
+  const handleEdit = (s: any) => {
     setEditingId(s.id);
-    const { data: linkRow } = await supabase
+    const numPrice = typeof s.price === 'number' ? s.price : Number(s.price) || 0;
+    setFormData({
+      title: s.title || '',
+      genre: s.genre || '',
+      rating: typeof s.rating === 'number' ? s.rating : 5,
+      description: s.description || '',
+      price: numPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      image_url: s.image_url || s.image || '',
+      featured: Boolean(s.featured),
+      access_link: s.access_link || '',
+      audio_type: (s.audio_type as 'dublado' | 'legendado') || 'dublado',
+    });
+    // Abre a modal de edição imediatamente para resposta visual instantânea
+    setIsDialogOpen(true);
+
+    // Carrega link de entrega específico do banco em segundo plano
+    supabase
       .from('series_access_links')
       .select('access_link')
       .eq('series_id', s.id)
-      .maybeSingle();
-    setFormData({
-      title: s.title,
-      genre: s.genre || '',
-      rating: s.rating || 0,
-      description: s.description || '',
-      price: s.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      image_url: s.image_url || '',
-      featured: s.featured,
-      access_link: linkRow?.access_link || '',
-      audio_type: s.audio_type || 'dublado',
-    });
-    setIsDialogOpen(true);
+      .maybeSingle()
+      .then(({ data: linkRow }) => {
+        if (linkRow?.access_link) {
+          setFormData((prev) => ({ ...prev, access_link: linkRow.access_link }));
+        }
+      })
+      .catch((err) => console.warn('Erro ao carregar link:', err));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const seriesData = {
-      ...formData,
-      rating: formData.rating || 0,
-      price: parseCurrency(formData.price),
-    };
-    if (editingId) {
-      await updateSeries.mutateAsync({ id: editingId, ...seriesData });
-    } else {
-      await createSeries.mutateAsync(seriesData);
+    setIsSubmitting(true);
+    try {
+      const seriesData = {
+        ...formData,
+        rating: formData.rating || 0,
+        price: parseCurrency(formData.price),
+      };
+      if (editingId) {
+        await updateSeries.mutateAsync({ id: editingId, ...seriesData });
+      } else {
+        await createSeries.mutateAsync(seriesData);
+      }
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (err: any) {
+      console.error('Falha ao salvar série:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsDialogOpen(false);
-    resetForm();
   };
 
   const handleDelete = async (id: string) => {
@@ -209,7 +260,7 @@ export default function Admin() {
             <div className="flex flex-wrap items-center gap-2.5">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button onClick={resetForm} size="sm" className="h-11 px-6 rounded-xl bg-zinc-950 text-white hover:bg-[#E31C25] font-black text-xs shadow-md gap-2 hover:scale-[1.02] active:scale-95 transition-all">
+                  <Button onClick={openNewSeriesModal} size="sm" className="h-11 px-6 rounded-xl bg-zinc-950 text-white hover:bg-[#E31C25] font-black text-xs shadow-md gap-2 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer">
                     <Plus className="h-4 w-4 stroke-[3]" />
                     Nova Série
                   </Button>
@@ -295,11 +346,28 @@ export default function Admin() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 mt-6 pt-3 border-t border-zinc-200">
-                      <Button type="submit" className="flex-1 bg-zinc-950 hover:bg-[#E31C25] text-white font-bold shadow-sm transition-colors">
-                        {editingId ? 'Salvar Alterações' : 'Adicionar ao Catálogo'}
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting || updateSeries.isPending || createSeries.isPending}
+                        className="flex-1 bg-zinc-950 hover:bg-[#E31C25] text-white font-bold shadow-sm transition-colors cursor-pointer"
+                      >
+                        {(isSubmitting || updateSeries.isPending || createSeries.isPending) ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Salvando no banco...
+                          </span>
+                        ) : (
+                          editingId ? 'Salvar Alterações' : 'Adicionar ao Catálogo'
+                        )}
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => { setIsDialogOpen(false); resetForm(); }}
-                        className="flex-1 sm:flex-initial border-zinc-200 text-zinc-700 hover:bg-zinc-100">Cancelar</Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => { setIsDialogOpen(false); resetForm(); }}
+                        className="flex-1 sm:flex-initial border-zinc-200 text-zinc-700 hover:bg-zinc-100 cursor-pointer"
+                      >
+                        Cancelar
+                      </Button>
                     </div>
                   </form>
                 </DialogContent>
@@ -491,72 +559,124 @@ export default function Admin() {
               </TabsList>
 
               <TabsContent value="series_catalog">
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                  <Input
-                    placeholder="Pesquisar série por título ou gênero..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs"
-                  />
+                <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between mb-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                    <Input
+                      placeholder="Pesquisar série por título ou gênero..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9 bg-white border-zinc-200 text-zinc-950 text-xs shadow-xs"
+                    />
+                  </div>
+                  <Button
+                    onClick={openNewSeriesModal}
+                    size="sm"
+                    className="h-10 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-xs gap-1.5 flex-shrink-0 cursor-pointer"
+                  >
+                    <Plus className="h-4 w-4 stroke-[3]" /> Adicionar Nova Série
+                  </Button>
                 </div>
 
                 {seriesLoading ? (
                   <AdminCatalogSkeleton count={6} />
                 ) : series && series.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {series
-                      .filter((s) => s.title.toLowerCase().includes(searchQuery.toLowerCase()) || s.genre.toLowerCase().includes(searchQuery.toLowerCase()))
-                      .map((s) => (
-                        <Card key={s.id} className="overflow-hidden border border-zinc-200/90 bg-white hover:border-zinc-300 transition-all hover:shadow-md flex flex-col justify-between">
-                          <CardContent className="p-4 flex flex-col h-full justify-between gap-4">
-                            <div className="flex gap-4 items-start">
-                              <img
-                                src={s.image_url}
-                                alt={s.title}
-                                className="w-16 h-24 object-cover rounded-xl border border-zinc-200 shadow-xs flex-shrink-0"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                                  <Badge variant="outline" className="text-[10px] uppercase font-bold text-zinc-700 bg-zinc-100 border-zinc-200">
-                                    {s.audio_type || 'Dublado'}
-                                  </Badge>
-                                  {s.featured && (
-                                    <Badge className="text-[9px] bg-amber-500 text-white font-bold border-none">
-                                      Destaque
-                                    </Badge>
-                                  )}
-                                </div>
-                                <h3 className="font-black text-sm text-zinc-950 line-clamp-1">{s.title}</h3>
-                                <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5">{s.genre || 'Sem categoria'}</p>
-                                <p className="text-xs font-extrabold text-emerald-600 mt-1">{formatCurrencyBRL(s.price)}</p>
-                              </div>
-                            </div>
+                  (() => {
+                    const filtered = series.filter(
+                      (s) =>
+                        s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (s.genre || '').toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                    const isFiltering = !!searchQuery.trim();
+                    const displayed = isFiltering ? filtered : filtered.slice(0, visibleSeriesLimit);
 
-                            <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-zinc-100 mt-auto">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleConvert(s.id, s.title)}
-                                className="h-8 px-2 text-[11px] border-teal-200 text-teal-700 hover:bg-teal-50 font-bold gap-1"
-                              >
-                                <Wand2 className="h-3 w-3" /> Anime
-                              </Button>
-                              <Button variant="outline" size="sm" onClick={() => handleEdit(s)} className="h-8 px-2.5 text-xs border-zinc-200 gap-1 hover:bg-zinc-100 text-zinc-700">
-                                <Edit className="h-3 w-3" /> Editar
-                              </Button>
-                              <Button variant="destructive" size="sm" onClick={() => handleDelete(s.id)} className="h-8 px-2 text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200">
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                  </div>
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between text-xs text-zinc-500 px-1">
+                          <span>
+                            Exibindo <strong>{displayed.length}</strong> de <strong>{filtered.length}</strong> séries
+                            {isFiltering && ` (filtradas por "${searchQuery}")`}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {displayed.map((s) => (
+                            <Card key={s.id} className="overflow-hidden border border-zinc-200/90 bg-white hover:border-zinc-300 transition-all hover:shadow-md flex flex-col justify-between">
+                              <CardContent className="p-4 flex flex-col h-full justify-between gap-4">
+                                <div className="flex gap-4 items-start">
+                                  <img
+                                    src={s.image_url}
+                                    alt={s.title}
+                                    className="w-16 h-24 object-cover rounded-xl border border-zinc-200 shadow-xs flex-shrink-0 bg-zinc-50"
+                                    onError={(e) => ((e.target as HTMLElement).style.opacity = '0.3')}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                                      <Badge variant="outline" className="text-[10px] uppercase font-bold text-zinc-700 bg-zinc-100 border-zinc-200">
+                                        {s.audio_type || 'Dublado'}
+                                      </Badge>
+                                      {s.featured && (
+                                        <Badge className="text-[9px] bg-amber-500 text-white font-bold border-none">
+                                          Destaque
+                                        </Badge>
+                                      )}
+                                    </div>
+                                    <h3 className="font-black text-sm text-zinc-950 line-clamp-1">{s.title}</h3>
+                                    <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5">{s.genre || 'Sem categoria'}</p>
+                                    <p className="text-xs font-extrabold text-emerald-600 mt-1">{formatCurrencyBRL(s.price)}</p>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-zinc-100 mt-auto">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleConvert(s.id, s.title)}
+                                    className="h-8 px-2 text-[11px] border-teal-200 text-teal-700 hover:bg-teal-50 font-bold gap-1 cursor-pointer"
+                                  >
+                                    <Wand2 className="h-3 w-3" /> Anime
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleEdit(s)}
+                                    className="h-8 px-2.5 text-xs border-zinc-200 gap-1 hover:bg-zinc-100 text-zinc-700 font-semibold cursor-pointer"
+                                  >
+                                    <Edit className="h-3 w-3" /> Editar
+                                  </Button>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleDelete(s.id)}
+                                    className="h-8 px-2 text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 cursor-pointer"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+
+                        {!isFiltering && filtered.length > displayed.length && (
+                          <div className="flex justify-center pt-4 pb-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => setVisibleSeriesLimit((prev) => prev + 30)}
+                              className="border-zinc-300 text-zinc-800 hover:bg-zinc-100 font-bold text-xs h-10 px-6 rounded-xl shadow-xs gap-2 cursor-pointer"
+                            >
+                              <ChevronDown className="h-4 w-4" />
+                              Carregar Mais Séries (+30) — Restam {filtered.length - displayed.length}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()
                 ) : (
                   <div className="text-center py-12 border border-dashed border-zinc-200 rounded-2xl bg-white shadow-xs">
                     <p className="text-zinc-500 mb-4 text-sm">Nenhuma série cadastrada no catálogo.</p>
-                    <Button onClick={() => setIsDialogOpen(true)} className="gap-2 bg-zinc-950 text-white hover:bg-[#E31C25] font-bold">
+                    <Button onClick={openNewSeriesModal} className="gap-2 bg-zinc-950 text-white hover:bg-[#E31C25] font-bold cursor-pointer">
                       <Plus className="h-4 w-4" /> Cadastrar Primeira Série
                     </Button>
                   </div>

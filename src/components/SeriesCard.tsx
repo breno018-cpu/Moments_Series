@@ -84,8 +84,8 @@ const SeriesCardComponent = ({
       const dy = Math.abs(e.clientY - pointerDownPos.current.y);
       const dt = Date.now() - pointerDownPos.current.time;
       pointerDownPos.current = null;
-      // Se moveu mais de 10px ou demorou mais de 450ms, o usuário estava rolando a página
-      if (dx > 10 || dy > 10 || dt > 450) {
+      // Se moveu mais de 15px ou demorou mais de 800ms, o usuário estava rolando a página
+      if (dx > 15 || dy > 15 || dt > 800) {
         return;
       }
     }
@@ -97,6 +97,14 @@ const SeriesCardComponent = ({
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleOpenModal();
+          }
+        }}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         className="group block cursor-pointer select-none"

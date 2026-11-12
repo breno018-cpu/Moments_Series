@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
-import { Plus, Edit, Trash2, Search, Sparkles, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Sparkles, Star, Loader2 } from 'lucide-react';
 import { StarRating } from '@/components/StarRating';
 import { Badge } from '@/components/ui/badge';
 import { ImageUploadField } from '@/components/ImageUploadField';
@@ -22,6 +22,7 @@ export const AdminAnimeManager = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     genre: '',
@@ -53,41 +54,57 @@ export const AdminAnimeManager = () => {
     setEditingId(null);
   };
 
-  const handleEdit = async (a: Anime) => {
+  const handleEdit = (a: Anime) => {
     setEditingId(a.id);
-    const { data: linkRow } = await supabase
+    const numPrice = typeof a.price === 'number' ? a.price : Number(a.price) || 0;
+    setFormData({
+      title: a.title || '',
+      genre: a.genre || '',
+      rating: typeof a.rating === 'number' ? a.rating : 5,
+      description: a.description || '',
+      price: numPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      image_url: a.image_url || '',
+      featured: Boolean(a.featured),
+      access_link: a.access_link || '',
+      audio_type: (a.audio_type as 'dublado' | 'legendado') || 'legendado',
+    });
+    // Abre a modal de edição imediatamente para resposta visual instantânea
+    setIsDialogOpen(true);
+
+    supabase
       .from('anime_access_links')
       .select('access_link')
       .eq('anime_id', a.id)
-      .maybeSingle();
-    setFormData({
-      title: a.title,
-      genre: a.genre || '',
-      rating: a.rating || 0,
-      description: a.description || '',
-      price: a.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-      image_url: a.image_url || '',
-      featured: a.featured,
-      access_link: linkRow?.access_link || '',
-      audio_type: a.audio_type || 'legendado',
-    });
-    setIsDialogOpen(true);
+      .maybeSingle()
+      .then(({ data: linkRow }) => {
+        if (linkRow?.access_link) {
+          setFormData((prev) => ({ ...prev, access_link: linkRow.access_link }));
+        }
+      })
+      .catch((err) => console.warn('Erro ao carregar link do anime:', err));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const animeData = {
-      ...formData,
-      rating: formData.rating || 0,
-      price: parseCurrency(formData.price),
-    };
-    if (editingId) {
-      await updateAnime.mutateAsync({ id: editingId, ...animeData });
-    } else {
-      await createAnime.mutateAsync(animeData);
+    setIsSubmitting(true);
+    try {
+      const animeData = {
+        ...formData,
+        rating: formData.rating || 0,
+        price: parseCurrency(formData.price),
+      };
+      if (editingId) {
+        await updateAnime.mutateAsync({ id: editingId, ...animeData });
+      } else {
+        await createAnime.mutateAsync(animeData);
+      }
+      setIsDialogOpen(false);
+      resetForm();
+    } catch (err) {
+      console.error('Falha ao salvar anime:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsDialogOpen(false);
-    resetForm();
   };
 
   const handleDelete = async (id: string) => {
@@ -196,10 +213,21 @@ export const AdminAnimeManager = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2 mt-6 pt-3 border-t border-zinc-200">
-                <Button type="submit" className="flex-1 bg-zinc-950 text-white font-bold hover:bg-[#E31C25] shadow-xs transition-colors">
-                  {editingId ? 'Salvar Alterações' : 'Adicionar ao Catálogo'}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || updateAnime.isPending || createAnime.isPending}
+                  className="flex-1 bg-zinc-950 text-white font-bold hover:bg-[#E31C25] shadow-xs transition-colors cursor-pointer"
+                >
+                  {(isSubmitting || updateAnime.isPending || createAnime.isPending) ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Salvando no banco...
+                    </span>
+                  ) : (
+                    editingId ? 'Salvar Alterações' : 'Adicionar ao Catálogo'
+                  )}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => { setIsDialogOpen(false); resetForm(); }} className="flex-1 sm:flex-initial border-zinc-200 text-zinc-700 hover:bg-zinc-100">Cancelar</Button>
+                <Button type="button" variant="outline" onClick={() => { setIsDialogOpen(false); resetForm(); }} className="flex-1 sm:flex-initial border-zinc-200 text-zinc-700 hover:bg-zinc-100 cursor-pointer">Cancelar</Button>
               </div>
             </form>
           </DialogContent>

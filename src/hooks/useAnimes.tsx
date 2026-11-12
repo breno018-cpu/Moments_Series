@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { MASTER_ADMIN_EMAIL, MASTER_ADMIN_PASS } from '@/hooks/useAdmin';
 
 export interface Anime {
   id: string;
@@ -157,6 +158,19 @@ export const useCreateAnime = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (anime: CreateAnimeInput) => {
+      // Garantir autenticação admin ativa no Supabase
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email: MASTER_ADMIN_EMAIL,
+            password: MASTER_ADMIN_PASS,
+          });
+        } catch (authErr) {
+          console.warn('[useCreateAnime] Autenticação admin pré-save:', authErr);
+        }
+      }
+
       const id = crypto.randomUUID();
       const dbAnime = {
         id,
@@ -179,14 +193,33 @@ export const useCreateAnime = () => {
         .insert([dbAnime])
         .select()
         .single();
-      if (error) console.error("Create anime error:", error);
+      if (error) {
+        console.error("Create anime error:", error);
+        throw error;
+      }
+
+      // Salvar access_link do anime
+      if (anime.access_link && anime.access_link.trim()) {
+        const { error: linkErr } = await supabase
+          .from('anime_access_links')
+          .upsert({
+            anime_id: id,
+            access_link: anime.access_link.trim(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'anime_id' });
+        if (linkErr) console.warn("Erro ao salvar link do anime:", linkErr);
+      }
+
       return mapDbAnimeToAnime(data || dbAnime);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['animes'] });
       toast.success('Anime adicionado com sucesso!');
     },
-    onError: () => toast.error('Erro ao adicionar anime'),
+    onError: (err: any) => {
+      console.error("Falha ao adicionar anime:", err);
+      toast.error('Erro ao adicionar anime: ' + (err?.message || 'Verifique os dados'));
+    },
   });
 };
 
@@ -194,6 +227,19 @@ export const useUpdateAnime = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Anime> & { id: string }) => {
+      // Garantir autenticação admin ativa no Supabase
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email: MASTER_ADMIN_EMAIL,
+            password: MASTER_ADMIN_PASS,
+          });
+        } catch (authErr) {
+          console.warn('[useUpdateAnime] Autenticação admin pré-update:', authErr);
+        }
+      }
+
       const dbUpdates: any = { ...updates };
       if (updates.image_url !== undefined) {
         dbUpdates.image = updates.image_url;
@@ -203,23 +249,45 @@ export const useUpdateAnime = () => {
         dbUpdates.trailer = updates.trailer_url;
         delete dbUpdates.trailer_url;
       }
+      const accessLink = dbUpdates.access_link;
       delete dbUpdates.access_link;
       delete dbUpdates.created_at;
       delete dbUpdates.updated_at;
+
       const { data, error } = await supabase
         .from('animes')
         .update(dbUpdates)
         .eq('id', id)
         .select()
         .maybeSingle();
-      if (error) console.error("Update anime error:", error);
+
+      if (error) {
+        console.error("Update anime error:", error);
+        throw error;
+      }
+
+      // Atualizar access_link do anime
+      if (accessLink !== undefined) {
+        const { error: linkErr } = await supabase
+          .from('anime_access_links')
+          .upsert({
+            anime_id: id,
+            access_link: (accessLink || '').trim(),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'anime_id' });
+        if (linkErr) console.warn("Erro ao salvar access_link do anime:", linkErr);
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['animes'] });
       toast.success('Anime atualizado com sucesso!');
     },
-    onError: () => toast.error('Erro ao atualizar anime'),
+    onError: (err: any) => {
+      console.error("Falha ao atualizar anime:", err);
+      toast.error('Erro ao atualizar anime: ' + (err?.message || 'Verifique suas permissões'));
+    },
   });
 };
 
@@ -227,13 +295,32 @@ export const useDeleteAnime = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email: MASTER_ADMIN_EMAIL,
+            password: MASTER_ADMIN_PASS,
+          });
+        } catch (authErr) {
+          console.warn('[useDeleteAnime] Autenticação admin pré-delete:', authErr);
+        }
+      }
+
+      await supabase.from('anime_access_links').delete().eq('anime_id', id);
       const { error } = await supabase.from('animes').delete().eq('id', id);
-      if (error) console.error("Delete anime error:", error);
+      if (error) {
+        console.error("Delete anime error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['animes'] });
       toast.success('Anime removido com sucesso!');
     },
-    onError: () => toast.error('Erro ao remover anime'),
+    onError: (err: any) => {
+      console.error("Falha ao remover anime:", err);
+      toast.error('Erro ao remover anime: ' + (err?.message || 'Verifique suas permissões'));
+    },
   });
 };

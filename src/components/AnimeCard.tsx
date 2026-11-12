@@ -76,7 +76,7 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
       const dy = Math.abs(e.clientY - pointerDownPos.current.y);
       const dt = Date.now() - pointerDownPos.current.time;
       pointerDownPos.current = null;
-      if (dx > 10 || dy > 10 || dt > 450) {
+      if (dx > 15 || dy > 15 || dt > 800) {
         return;
       }
     }
@@ -88,6 +88,14 @@ const AnimeCardComponent = ({ anime }: AnimeCardProps) => {
   return (
     <>
       <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsModalOpen(true);
+          }
+        }}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         className="group block cursor-pointer select-none"

@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import React, { Component, lazy, Suspense, useEffect, ErrorInfo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
@@ -198,6 +198,9 @@ const AppContent = () => (
               <Route path="/access" element={<AccessSeries />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/catalog" element={<Navigate to="/admin?tab=catalog" replace />} />
+              <Route path="/admin/catalogo" element={<Navigate to="/admin?tab=catalog" replace />} />
+              <Route path="/admin/series" element={<Navigate to="/admin?tab=catalog" replace />} />
               <Route path="/admin/coupons" element={<AdminCoupons />} />
               <Route path="/admin/sales" element={<AdminSales />} />
               <Route path="/termos" element={<Termos />} />
