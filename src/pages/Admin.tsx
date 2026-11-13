@@ -196,6 +196,7 @@ export default function Admin() {
       resetForm();
     } catch (err: any) {
       console.error('Falha ao salvar série:', err);
+      toast.error('Erro ao salvar no banco: ' + (err?.message || 'Tente novamente'));
     } finally {
       setIsSubmitting(false);
     }

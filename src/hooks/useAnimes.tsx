@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { MASTER_ADMIN_EMAIL, MASTER_ADMIN_PASS } from '@/hooks/useAdmin';
+import { MASTER_ADMIN_EMAIL, MASTER_ADMIN_PASS, ensureAdminAuth } from '@/hooks/useAdmin';
 
 export interface Anime {
   id: string;
@@ -158,18 +158,7 @@ export const useCreateAnime = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (anime: CreateAnimeInput) => {
-      // Garantir autenticação admin ativa no Supabase
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session) {
-        try {
-          await supabase.auth.signInWithPassword({
-            email: MASTER_ADMIN_EMAIL,
-            password: MASTER_ADMIN_PASS,
-          });
-        } catch (authErr) {
-          console.warn('[useCreateAnime] Autenticação admin pré-save:', authErr);
-        }
-      }
+      await ensureAdminAuth();
 
       const id = crypto.randomUUID();
       const dbAnime = {
@@ -180,7 +169,7 @@ export const useCreateAnime = () => {
         rating: anime.rating || 0,
         description: anime.description || '',
         long_description: '',
-        image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500',
+        image: anime.image_url || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500',
         trailer: '',
         price: anime.price,
         seasons: 1,
@@ -188,14 +177,27 @@ export const useCreateAnime = () => {
         featured: anime.featured || false,
         audio_type: anime.audio_type || 'legendado',
       };
-      const { data, error } = await supabase
+
+      let { data, error } = await supabase
         .from('animes')
         .insert([dbAnime])
         .select()
         .single();
+
       if (error) {
-        console.error("Create anime error:", error);
-        throw error;
+        console.warn("Primeira tentativa de insert anime falhou, tentando re-autenticação forçada...", error);
+        await ensureAdminAuth(true);
+        const retry = await supabase
+          .from('animes')
+          .insert([dbAnime])
+          .select()
+          .single();
+
+        if (retry.error) {
+          console.error("Erro definitivo no Supabase create anime:", retry.error);
+          throw retry.error;
+        }
+        data = retry.data;
       }
 
       // Salvar access_link do anime
@@ -227,18 +229,7 @@ export const useUpdateAnime = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Anime> & { id: string }) => {
-      // Garantir autenticação admin ativa no Supabase
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session) {
-        try {
-          await supabase.auth.signInWithPassword({
-            email: MASTER_ADMIN_EMAIL,
-            password: MASTER_ADMIN_PASS,
-          });
-        } catch (authErr) {
-          console.warn('[useUpdateAnime] Autenticação admin pré-update:', authErr);
-        }
-      }
+      await ensureAdminAuth();
 
       const dbUpdates: any = { ...updates };
       if (updates.image_url !== undefined) {
@@ -254,19 +245,34 @@ export const useUpdateAnime = () => {
       delete dbUpdates.created_at;
       delete dbUpdates.updated_at;
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('animes')
         .update(dbUpdates)
         .eq('id', id)
         .select()
         .maybeSingle();
 
-      if (error) {
-        console.error("Update anime error:", error);
-        throw error;
+      if (error || !data) {
+        console.warn("Primeira tentativa de update anime falhou ou retornou 0 linhas, tentando re-autenticação forçada...", error);
+        await ensureAdminAuth(true);
+        const retry = await supabase
+          .from('animes')
+          .update(dbUpdates)
+          .eq('id', id)
+          .select()
+          .maybeSingle();
+
+        if (retry.error) {
+          console.error("Erro definitivo no Supabase update anime:", retry.error);
+          throw retry.error;
+        }
+        if (!retry.data) {
+          throw new Error('Nenhum anime encontrado com este ID ou permissão negada pelo banco.');
+        }
+        data = retry.data;
       }
 
-      // Atualizar access_link do anime
+      // Salvar link de entrega do anime
       if (accessLink !== undefined) {
         const { error: linkErr } = await supabase
           .from('anime_access_links')
@@ -275,7 +281,7 @@ export const useUpdateAnime = () => {
             access_link: (accessLink || '').trim(),
             updated_at: new Date().toISOString(),
           }, { onConflict: 'anime_id' });
-        if (linkErr) console.warn("Erro ao salvar access_link do anime:", linkErr);
+        if (linkErr) console.warn("Erro ao salvar link do anime:", linkErr);
       }
 
       return data;

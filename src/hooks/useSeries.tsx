@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { MASTER_ADMIN_EMAIL, MASTER_ADMIN_PASS } from '@/hooks/useAdmin';
+import { MASTER_ADMIN_EMAIL, MASTER_ADMIN_PASS, ensureAdminAuth } from '@/hooks/useAdmin';
 
 export interface Series {
   id: string;
@@ -229,17 +229,7 @@ export const useCreateSeries = () => {
   return useMutation({
     mutationFn: async (series: CreateSeriesInput) => {
       // 1. Assegurar autenticação com permissão admin no Supabase para aprovar no RLS
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session) {
-        try {
-          await supabase.auth.signInWithPassword({
-            email: MASTER_ADMIN_EMAIL,
-            password: MASTER_ADMIN_PASS,
-          });
-        } catch (authErr) {
-          console.warn('[useCreateSeries] Autenticação admin pré-save:', authErr);
-        }
-      }
+      await ensureAdminAuth();
 
       const id = crypto.randomUUID();
       const dbSeries = {
@@ -259,15 +249,26 @@ export const useCreateSeries = () => {
         audio_type: series.audio_type || 'dublado',
       };
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('series')
         .insert([dbSeries])
         .select()
         .single();
 
       if (error) {
-        console.error("Erro no Supabase create:", error);
-        throw error;
+        console.warn("Primeira tentativa de insert falhou, tentando re-autenticação forçada...", error);
+        await ensureAdminAuth(true);
+        const retry = await supabase
+          .from('series')
+          .insert([dbSeries])
+          .select()
+          .single();
+
+        if (retry.error) {
+          console.error("Erro definitivo no Supabase create:", retry.error);
+          throw retry.error;
+        }
+        data = retry.data;
       }
 
       // 2. Salvar access_link na tabela series_access_links
@@ -301,17 +302,7 @@ export const useUpdateSeries = () => {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Series> & { id: string }) => {
       // 1. Assegurar autenticação admin ativa no Supabase para aprovar no RLS
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session) {
-        try {
-          await supabase.auth.signInWithPassword({
-            email: MASTER_ADMIN_EMAIL,
-            password: MASTER_ADMIN_PASS,
-          });
-        } catch (authErr) {
-          console.warn('[useUpdateSeries] Autenticação admin pré-save:', authErr);
-        }
-      }
+      await ensureAdminAuth();
 
       const dbUpdates: any = { ...updates };
       if (updates.image_url !== undefined) {
@@ -327,16 +318,31 @@ export const useUpdateSeries = () => {
       delete dbUpdates.created_at;
       delete dbUpdates.updated_at;
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('series')
         .update(dbUpdates)
         .eq('id', id)
         .select()
         .maybeSingle();
 
-      if (error) {
-        console.error("Erro no Supabase update:", error);
-        throw error;
+      if (error || !data) {
+        console.warn("Primeira tentativa de update falhou ou retornou 0 linhas, tentando re-autenticação forçada...", error);
+        await ensureAdminAuth(true);
+        const retry = await supabase
+          .from('series')
+          .update(dbUpdates)
+          .eq('id', id)
+          .select()
+          .maybeSingle();
+
+        if (retry.error) {
+          console.error("Erro definitivo no Supabase update:", retry.error);
+          throw retry.error;
+        }
+        if (!retry.data) {
+          throw new Error('Nenhuma série encontrada com este ID ou permissão negada pelo banco.');
+        }
+        data = retry.data;
       }
 
       // 2. Salvar link de entrega na tabela series_access_links

@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAnimes, useCreateAnime, useUpdateAnime, useDeleteAnime, Anime } from '@/hooks/useAnimes';
@@ -100,8 +101,9 @@ export const AdminAnimeManager = () => {
       }
       setIsDialogOpen(false);
       resetForm();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Falha ao salvar anime:', err);
+      toast.error('Erro ao salvar no banco: ' + (err?.message || 'Tente novamente'));
     } finally {
       setIsSubmitting(false);
     }

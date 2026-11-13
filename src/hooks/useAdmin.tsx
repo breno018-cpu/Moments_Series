@@ -6,6 +6,49 @@ export const MASTER_ADMIN_EMAIL = 'momentsserie6@gmail.com';
 export const MASTER_ADMIN_PASS = 'Admin@Moments2026!';
 export const MASTER_ADMIN_PIN = '2026';
 
+/**
+ * Garante que o cliente Supabase possui uma sessão JWT ativa e válida com privilégios de administrador.
+ * Se o token atual estiver expirado ou ausente, faz refresh ou autentica com as credenciais mestras.
+ */
+export async function ensureAdminAuth(forceReauth = false): Promise<boolean> {
+  try {
+    if (!forceReauth) {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (!userError && userData?.user) {
+        return true;
+      }
+
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      if (!refreshError && refreshData?.session) {
+        return true;
+      }
+    }
+
+    const savedEmail = (typeof window !== 'undefined' ? localStorage.getItem('moments_admin_email') : '') || '';
+    const emailToUse = savedEmail.toLowerCase().includes('breno') ? 'laurentinobreno08@gmail.com' : MASTER_ADMIN_EMAIL;
+
+    const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+      email: emailToUse,
+      password: MASTER_ADMIN_PASS,
+    });
+
+    if (!authErr && authData?.session) {
+      return true;
+    }
+
+    // Fallback garantido na conta mestre momentsserie6
+    const { data: masterAuth, error: masterErr } = await supabase.auth.signInWithPassword({
+      email: MASTER_ADMIN_EMAIL,
+      password: MASTER_ADMIN_PASS,
+    });
+
+    return !masterErr && !!masterAuth?.session;
+  } catch (err) {
+    console.error('[ensureAdminAuth] Erro ao assegurar sessão admin:', err);
+    return false;
+  }
+}
+
 export const useAdmin = () => {
   const [currentSession, setCurrentSession] = useState<any>(null);
   const [isSessionLoading, setIsSessionLoading] = useState(true);

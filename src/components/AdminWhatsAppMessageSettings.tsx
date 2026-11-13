@@ -123,7 +123,7 @@ export const AdminWhatsAppMessageSettings = () => {
       .replace(/{pedido}/g, '42918')
       .replace(/{valor}/g, '19,90')
       .replace(/{itens}/g, 'Amor Proibido (Temporada Completa)')
-      .replace(/{link}/g, 'https://moments.app.br/acesso/player?token=demo')
+      .replace(/{link}/g, 'https://www.momentsseries.com.br/acesso/player?token=demo')
       .replace(/{pix_copia_cola}/g, '00020126580014br.gov.bcb.pix0136123e4567...');
   };
 
@@ -143,8 +143,8 @@ export const AdminWhatsAppMessageSettings = () => {
         customerPhone: cleanPhone,
         orderId: 'DEMO-PREVIEW',
         totalAmount: 19.90,
-        items: ['Amor Proibido (Temporada Completa): https://moments.app.br/acesso/player?token=demo'],
-        trackingUrl: 'https://moments.app.br/acesso/player?token=demo',
+        items: ['Amor Proibido (Temporada Completa): https://www.momentsseries.com.br/acesso/player?token=demo'],
+        trackingUrl: 'https://www.momentsseries.com.br/acesso/player?token=demo',
         customMessage: demoMessage,
         labels: ['Teste Manual', 'Preview Template'],
       });
