@@ -15,34 +15,42 @@ export async function ensureAdminAuth(forceReauth = false): Promise<boolean> {
     if (!forceReauth) {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (!userError && userData?.user) {
-        return true;
+        const uid = userData.user.id;
+        const email = (userData.user.email || '').toLowerCase();
+        if (
+          email === 'momentsserie6@gmail.com' ||
+          email === 'laurentinobreno08@gmail.com' ||
+          uid === '78b8af22-4484-469f-85c1-7f6259f8dc22' ||
+          uid === '7f6efca7-d169-4baf-87c9-56fe6c28c8af'
+        ) {
+          return true;
+        }
       }
 
       const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
       if (!refreshError && refreshData?.session) {
-        return true;
+        const email = (refreshData.session.user.email || '').toLowerCase();
+        if (email === 'momentsserie6@gmail.com' || email === 'laurentinobreno08@gmail.com') {
+          return true;
+        }
       }
     }
 
-    const savedEmail = (typeof window !== 'undefined' ? localStorage.getItem('moments_admin_email') : '') || '';
-    const emailToUse = savedEmail.toLowerCase().includes('breno') ? 'laurentinobreno08@gmail.com' : MASTER_ADMIN_EMAIL;
-
-    const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
-      email: emailToUse,
-      password: MASTER_ADMIN_PASS,
-    });
-
-    if (!authErr && authData?.session) {
-      return true;
-    }
-
-    // Fallback garantido na conta mestre momentsserie6
+    // Autentica diretamente com a conta mestre padrão com permissão total garantida no Supabase
     const { data: masterAuth, error: masterErr } = await supabase.auth.signInWithPassword({
       email: MASTER_ADMIN_EMAIL,
       password: MASTER_ADMIN_PASS,
     });
 
-    return !masterErr && !!masterAuth?.session;
+    if (!masterErr && masterAuth?.session) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('moments_admin_session', 'true');
+        localStorage.setItem('moments_admin_email', MASTER_ADMIN_EMAIL);
+      }
+      return true;
+    }
+
+    return false;
   } catch (err) {
     console.error('[ensureAdminAuth] Erro ao assegurar sessão admin:', err);
     return false;

@@ -273,14 +273,25 @@ export const useCreateSeries = () => {
 
       // 2. Salvar access_link na tabela series_access_links
       if (series.access_link && series.access_link.trim()) {
+        const cleanLink = series.access_link.trim();
         const { error: linkErr } = await supabase
           .from('series_access_links')
           .upsert({
             series_id: id,
-            access_link: series.access_link.trim(),
+            access_link: cleanLink,
             updated_at: new Date().toISOString(),
           }, { onConflict: 'series_id' });
-        if (linkErr) console.warn("Erro ao salvar access_link:", linkErr);
+        if (linkErr) {
+          console.warn("Erro ao salvar access_link, tentando re-autenticação:", linkErr);
+          await ensureAdminAuth(true);
+          await supabase
+            .from('series_access_links')
+            .upsert({
+              series_id: id,
+              access_link: cleanLink,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'series_id' });
+        }
       }
 
       return mapDbSeriesToSeries(data || dbSeries);
@@ -376,6 +387,7 @@ export const useUpdateSeries = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['series'] });
+      queryClient.invalidateQueries({ queryKey: ['series_access_links_map'] });
       toast.success('Série atualizada com sucesso!');
     },
     onError: (err: any) => {
@@ -417,6 +429,7 @@ export const useDeleteSeries = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['series'] });
+      queryClient.invalidateQueries({ queryKey: ['series_access_links_map'] });
       toast.success('Série removida com sucesso!');
     },
     onError: (err: any) => {

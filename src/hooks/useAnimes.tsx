@@ -302,6 +302,7 @@ export const useUpdateAnime = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['animes'] });
+      queryClient.invalidateQueries({ queryKey: ['anime_access_links_map'] });
       toast.success('Anime atualizado com sucesso!');
     },
     onError: (err: any) => {
@@ -336,6 +337,7 @@ export const useDeleteAnime = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['animes'] });
+      queryClient.invalidateQueries({ queryKey: ['anime_access_links_map'] });
       toast.success('Anime removido com sucesso!');
     },
     onError: (err: any) => {
