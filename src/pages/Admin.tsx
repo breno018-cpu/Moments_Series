@@ -64,16 +64,27 @@ export default function Admin() {
     if (tabParam && validModules.includes(tabParam as ModuleType)) {
       return tabParam as ModuleType;
     }
+    const saved = typeof window !== 'undefined' ? (localStorage.getItem('moments_admin_active_module') as ModuleType) : null;
+    if (saved && validModules.includes(saved)) {
+      return saved;
+    }
     return 'sales';
   });
 
   const setActiveModule = (mod: ModuleType) => {
+    const currentScroll = window.scrollY;
     setActiveModuleState(mod);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('moments_admin_active_module', mod);
+    }
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       next.set('tab', mod);
       return next;
     }, { replace: true });
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: currentScroll, behavior: 'instant' });
+    });
   };
 
   useEffect(() => {
@@ -81,6 +92,69 @@ export default function Admin() {
       setActiveModuleState(tabParam as ModuleType);
     }
   }, [tabParam, activeModule]);
+
+  // Sub-abas persistentes em localStorage para nunca resetar ao recarregar a página
+  const [salesSubTab, setSalesSubTabState] = useState<string>(() => {
+    return (typeof window !== 'undefined' ? localStorage.getItem('moments_admin_sales_subtab') : null) || 'pix_list';
+  });
+  const setSalesSubTab = (val: string) => {
+    setSalesSubTabState(val);
+    if (typeof window !== 'undefined') localStorage.setItem('moments_admin_sales_subtab', val);
+  };
+
+  const [catalogSubTab, setCatalogSubTabState] = useState<string>(() => {
+    return (typeof window !== 'undefined' ? localStorage.getItem('moments_admin_catalog_subtab') : null) || 'series_catalog';
+  });
+  const setCatalogSubTab = (val: string) => {
+    setCatalogSubTabState(val);
+    if (typeof window !== 'undefined') localStorage.setItem('moments_admin_catalog_subtab', val);
+  };
+
+  const [marketingSubTab, setMarketingSubTabState] = useState<string>(() => {
+    return (typeof window !== 'undefined' ? localStorage.getItem('moments_admin_marketing_subtab') : null) || 'popup_marketing';
+  });
+  const setMarketingSubTab = (val: string) => {
+    setMarketingSubTabState(val);
+    if (typeof window !== 'undefined') localStorage.setItem('moments_admin_marketing_subtab', val);
+  };
+
+  const [settingsSubTab, setSettingsSubTabState] = useState<string>(() => {
+    return (typeof window !== 'undefined' ? localStorage.getItem('moments_admin_settings_subtab') : null) || 'contacts';
+  });
+  const setSettingsSubTab = (val: string) => {
+    setSettingsSubTabState(val);
+    if (typeof window !== 'undefined') localStorage.setItem('moments_admin_settings_subtab', val);
+  };
+
+  // Preservação de rolagem: impede que a página pule para o topo na rotação ou clique de botões
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        lastScrollY = window.scrollY;
+      }
+    };
+
+    const restoreScroll = () => {
+      if (lastScrollY > 0) {
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: lastScrollY, behavior: 'instant' });
+        });
+        setTimeout(() => {
+          window.scrollTo({ top: lastScrollY, behavior: 'instant' });
+        }, 100);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('orientationchange', restoreScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('orientationchange', restoreScroll);
+    };
+  }, []);
 
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -144,11 +218,16 @@ export default function Admin() {
   };
 
   const openNewSeriesModal = () => {
+    const currentScroll = window.scrollY;
     resetForm();
     setIsDialogOpen(true);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: currentScroll, behavior: 'instant' });
+    });
   };
 
   const handleEdit = (s: any) => {
+    const currentScroll = window.scrollY;
     setEditingId(s.id);
     const numPrice = typeof s.price === 'number' ? s.price : Number(s.price) || 0;
     const existingLink = accessLinksMap.get(s.id) || s.access_link || '';
@@ -163,8 +242,11 @@ export default function Admin() {
       access_link: existingLink,
       audio_type: (s.audio_type as 'dublado' | 'legendado') || 'dublado',
     });
-    // Abre a modal de edição imediatamente para resposta visual instantânea
+    // Abre a modal de edição imediatamente para resposta visual instantânea sem pular rolagem
     setIsDialogOpen(true);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: currentScroll, behavior: 'instant' });
+    });
 
     // Se o link não estava em memória, busca com garantia de autenticação
     if (!existingLink) {
@@ -186,6 +268,7 @@ export default function Admin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const currentScroll = window.scrollY;
     setIsSubmitting(true);
     try {
       const seriesData = {
@@ -200,6 +283,9 @@ export default function Admin() {
       }
       setIsDialogOpen(false);
       resetForm();
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: currentScroll, behavior: 'instant' });
+      });
     } catch (err: any) {
       console.error('Falha ao salvar série:', err);
       toast.error('Erro ao salvar no banco: ' + (err?.message || 'Tente novamente'));
@@ -272,7 +358,11 @@ export default function Admin() {
                     Nova Série
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950 ios-momentum-scroll">
+                <DialogContent
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                  className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950 ios-momentum-scroll"
+                >
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-950">
                       <Sparkles className="h-5 w-5 text-purple-600" />
@@ -391,6 +481,7 @@ export default function Admin() {
         {/* 5 Abas de Navegação Responsivas */}
         <div className="flex sm:grid sm:grid-cols-5 gap-2 mb-6 overflow-x-auto pb-1 sm:pb-0 no-scrollbar -mx-1 px-1 sm:mx-0 sm:px-0 touch-pan-x ios-momentum-scroll">
           <button
+            type="button"
             onClick={() => setActiveModule('sales')}
             className={`min-w-[140px] sm:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border text-left transition-colors flex flex-col gap-1 sm:gap-1.5 flex-shrink-0 sm:flex-shrink ${
               activeModule === 'sales'
@@ -413,6 +504,7 @@ export default function Admin() {
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveModule('catalog')}
             className={`min-w-[140px] sm:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border text-left transition-colors flex flex-col gap-1 sm:gap-1.5 flex-shrink-0 sm:flex-shrink ${
               activeModule === 'catalog'
@@ -435,6 +527,7 @@ export default function Admin() {
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveModule('coupons')}
             className={`min-w-[140px] sm:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border text-left transition-colors flex flex-col gap-1 sm:gap-1.5 flex-shrink-0 sm:flex-shrink ${
               activeModule === 'coupons'
@@ -457,6 +550,7 @@ export default function Admin() {
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveModule('marketing')}
             className={`min-w-[140px] sm:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border text-left transition-colors flex flex-col gap-1 sm:gap-1.5 flex-shrink-0 sm:flex-shrink ${
               activeModule === 'marketing'
@@ -479,6 +573,7 @@ export default function Admin() {
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveModule('settings')}
             className={`min-w-[140px] sm:min-w-0 flex-1 p-2.5 sm:p-3 rounded-xl border text-left transition-colors flex flex-col gap-1 sm:gap-1.5 flex-shrink-0 sm:flex-shrink ${
               activeModule === 'settings'
@@ -513,7 +608,7 @@ export default function Admin() {
               </p>
             </div>
 
-            <Tabs defaultValue="pix_list" className="w-full">
+            <Tabs value={salesSubTab} onValueChange={setSalesSubTab} className="w-full">
               <TabsList className="bg-white border border-zinc-200 p-1.5 rounded-2xl mb-4 flex-wrap shadow-xs">
                 <TabsTrigger value="pix_list" className="gap-2 text-xs font-bold data-[state=active]:bg-emerald-500 data-[state=active]:text-white border border-transparent">
                   <FileText className="h-3.5 w-3.5" /> Lista de Vendas PIX
@@ -549,7 +644,7 @@ export default function Admin() {
               </p>
             </div>
 
-            <Tabs defaultValue="series_catalog" className="w-full">
+            <Tabs value={catalogSubTab} onValueChange={setCatalogSubTab} className="w-full">
               <TabsList className="bg-white border border-zinc-200 p-1.5 rounded-2xl mb-4 flex-wrap shadow-xs">
                 <TabsTrigger value="series_catalog" className="gap-2 text-xs font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white border border-transparent">
                   <Film className="h-3.5 w-3.5" /> Catálogo Séries ({seriesCount})
@@ -789,7 +884,7 @@ export default function Admin() {
               </p>
             </div>
 
-            <Tabs defaultValue="popup_marketing" className="w-full">
+            <Tabs value={marketingSubTab} onValueChange={setMarketingSubTab} className="w-full">
               <TabsList className="bg-white border border-zinc-200 p-1.5 rounded-2xl mb-4 flex-wrap shadow-xs">
                 <TabsTrigger value="popup_marketing" className="gap-2 text-xs font-bold data-[state=active]:bg-pink-600 data-[state=active]:text-white border border-transparent">
                   <Sparkles className="h-3.5 w-3.5" /> Pop-up do Site & Pixel Meta
@@ -824,7 +919,7 @@ export default function Admin() {
               </p>
             </div>
 
-            <Tabs defaultValue="contacts" className="w-full">
+            <Tabs value={settingsSubTab} onValueChange={setSettingsSubTab} className="w-full">
               <TabsList className="bg-white border border-zinc-200 p-1.5 rounded-2xl mb-4 flex-wrap shadow-xs">
                 <TabsTrigger value="whatsapp_messages" className="gap-2 text-xs font-bold data-[state=active]:bg-emerald-600 data-[state=active]:text-white border border-transparent">
                   <MessageCircle className="h-3.5 w-3.5" /> Mensagens WhatsApp (Gateway)

@@ -58,6 +58,7 @@ export const AdminAnimeManager = () => {
   };
 
   const handleEdit = (a: Anime) => {
+    const currentScroll = window.scrollY;
     setEditingId(a.id);
     const numPrice = typeof a.price === 'number' ? a.price : Number(a.price) || 0;
     const existingLink = animeAccessLinksMap.get(a.id) || a.access_link || '';
@@ -72,8 +73,11 @@ export const AdminAnimeManager = () => {
       access_link: existingLink,
       audio_type: (a.audio_type as 'dublado' | 'legendado') || 'legendado',
     });
-    // Abre a modal de edição imediatamente para resposta visual instantânea
+    // Abre a modal de edição imediatamente para resposta visual instantânea sem pular rolagem
     setIsDialogOpen(true);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: currentScroll, behavior: 'instant' });
+    });
 
     if (!existingLink) {
       ensureAdminAuth().then(() => {
@@ -94,6 +98,7 @@ export const AdminAnimeManager = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const currentScroll = window.scrollY;
     setIsSubmitting(true);
     try {
       const animeData = {
@@ -108,6 +113,9 @@ export const AdminAnimeManager = () => {
       }
       setIsDialogOpen(false);
       resetForm();
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: currentScroll, behavior: 'instant' });
+      });
     } catch (err: any) {
       console.error('Falha ao salvar anime:', err);
       toast.error('Erro ao salvar no banco: ' + (err?.message || 'Tente novamente'));
@@ -143,7 +151,11 @@ export const AdminAnimeManager = () => {
               <Plus className="h-4 w-4 stroke-[3]" /> Adicionar Anime
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950 ios-momentum-scroll">
+          <DialogContent
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            className="w-[calc(100vw-1.5rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto overflow-x-hidden p-4 sm:p-7 bg-white border-zinc-200 rounded-2xl shadow-2xl custom-scrollbar text-zinc-950 ios-momentum-scroll"
+          >
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2 text-zinc-950">
                 <Sparkles className="h-5 w-5 text-teal-600" />
