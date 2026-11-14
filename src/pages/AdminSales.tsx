@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAdmin } from '@/hooks/useAdmin';
+import { useAdmin, ensureAdminAuth } from '@/hooks/useAdmin';
 import { useAdminSales, SaleRecord } from '@/hooks/useAdminSales';
 import { AdminHeader } from '@/components/AdminHeader';
 import { Button } from '@/components/ui/button';
@@ -81,6 +81,7 @@ export default function AdminSales({ embedded = false }: AdminSalesProps = {}) {
   const handleResendEmail = async (orderId: string) => {
     setResendingId(orderId);
     try {
+      await ensureAdminAuth();
       const { data, error } = await supabase.functions.invoke('resend-access-email', {
         body: { orderId },
       });
@@ -109,14 +110,49 @@ export default function AdminSales({ embedded = false }: AdminSalesProps = {}) {
 
     setResendingWaId(sale.id);
     try {
-      // Busca link de acesso para o envio direto
-      const { data: linkRow } = await supabase
-        .from('series_access_links')
-        .select('access_link')
-        .eq('series_id', sale.series_id)
-        .maybeSingle();
+      await ensureAdminAuth();
 
-      const accessLink = linkRow?.access_link || `${window.location.origin}/acesso`;
+      // Busca link de acesso para o envio direto em série, anime ou compra existente
+      let resolvedLink = '';
+
+      if (sale.series_id) {
+        const { data: linkRow } = await supabase
+          .from('series_access_links')
+          .select('access_link')
+          .eq('series_id', sale.series_id)
+          .maybeSingle();
+
+        if (linkRow?.access_link) {
+          resolvedLink = linkRow.access_link;
+        } else {
+          const { data: animeRow } = await supabase
+            .from('anime_access_links')
+            .select('access_link')
+            .eq('anime_id', sale.series_id)
+            .maybeSingle();
+          if (animeRow?.access_link) {
+            resolvedLink = animeRow.access_link;
+          }
+        }
+      }
+
+      if (!resolvedLink) {
+        const { data: purchaseRow } = await supabase
+          .from('purchases')
+          .select('access_link')
+          .eq('order_id', sale.id)
+          .maybeSingle();
+
+        if (purchaseRow?.access_link && !purchaseRow.access_link.toLowerCase().includes('não disponível')) {
+          resolvedLink = purchaseRow.access_link;
+        }
+      }
+
+      const accessLink = resolvedLink || `${window.location.origin}/acesso`;
+
+      if (!resolvedLink) {
+        toast.warning('Aviso: Esta série ainda não tem link cadastrado no catálogo. O link padrão foi utilizado.');
+      }
 
       // Buscar template salvo se existir no site_settings
       let templateRaw = `Oba, *{nome}*! 🚀\n\nSeu pagamento referente ao pedido *#{pedido}* foi *CONFIRMADO* com sucesso!\n\n💰 Valor: *R$ {valor}*\n🍿 Conteúdo: *{itens}*\n\n🔗 *Seu link de acesso exclusivo à série está liberado:*\n{link}\n\nAproveite e assista direto no seu celular ou navegador! Qualquer dúvida estamos à disposição.`;

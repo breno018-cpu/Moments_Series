@@ -1,8 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAdmin } from '@/hooks/useAdmin';
-import { useSeries, useCreateSeries, useUpdateSeries, useDeleteSeries } from '@/hooks/useSeries';
+import { useAdmin, ensureAdminAuth } from '@/hooks/useAdmin';
+import { useSeries, useCreateSeries, useUpdateSeries, useDeleteSeries, useSeriesAccessLinks } from '@/hooks/useSeries';
 import { useConvertSeriesToAnime } from '@/hooks/useConvertSeriesToAnime';
 import { AdminHeader } from '@/components/AdminHeader';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,7 @@ export default function Admin() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: adminStatus, isLoading: adminLoading } = useAdmin();
   const { data: series, isLoading: seriesLoading } = useSeries();
+  const { data: accessLinksMap = new Map<string, string>() } = useSeriesAccessLinks(!!adminStatus?.isAdmin);
   const isRayane = (adminStatus?.email || '').toLowerCase().includes('rayane');
   const createSeries = useCreateSeries();
   const updateSeries = useUpdateSeries();
@@ -150,6 +151,7 @@ export default function Admin() {
   const handleEdit = (s: any) => {
     setEditingId(s.id);
     const numPrice = typeof s.price === 'number' ? s.price : Number(s.price) || 0;
+    const existingLink = accessLinksMap.get(s.id) || s.access_link || '';
     setFormData({
       title: s.title || '',
       genre: s.genre || '',
@@ -158,24 +160,28 @@ export default function Admin() {
       price: numPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       image_url: s.image_url || s.image || '',
       featured: Boolean(s.featured),
-      access_link: s.access_link || '',
+      access_link: existingLink,
       audio_type: (s.audio_type as 'dublado' | 'legendado') || 'dublado',
     });
     // Abre a modal de edição imediatamente para resposta visual instantânea
     setIsDialogOpen(true);
 
-    // Carrega link de entrega específico do banco em segundo plano
-    supabase
-      .from('series_access_links')
-      .select('access_link')
-      .eq('series_id', s.id)
-      .maybeSingle()
-      .then(({ data: linkRow }) => {
-        if (linkRow?.access_link) {
-          setFormData((prev) => ({ ...prev, access_link: linkRow.access_link }));
-        }
-      })
-      .catch((err) => console.warn('Erro ao carregar link:', err));
+    // Se o link não estava em memória, busca com garantia de autenticação
+    if (!existingLink) {
+      ensureAdminAuth().then(() => {
+        supabase
+          .from('series_access_links')
+          .select('access_link')
+          .eq('series_id', s.id)
+          .maybeSingle()
+          .then(({ data: linkRow }) => {
+            if (linkRow?.access_link) {
+              setFormData((prev) => ({ ...prev, access_link: linkRow.access_link }));
+            }
+          })
+          .catch((err) => console.warn('Erro ao carregar link:', err));
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -619,6 +625,15 @@ export default function Admin() {
                                       {s.featured && (
                                         <Badge className="text-[9px] bg-amber-500 text-white font-bold border-none">
                                           Destaque
+                                        </Badge>
+                                      )}
+                                      {accessLinksMap.has(s.id) ? (
+                                        <Badge variant="outline" className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border-emerald-200">
+                                          Link OK
+                                        </Badge>
+                                      ) : (
+                                        <Badge variant="outline" className="text-[9px] font-bold text-rose-700 bg-rose-50 border-rose-200">
+                                          Sem Link
                                         </Badge>
                                       )}
                                     </div>

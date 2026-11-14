@@ -287,6 +287,7 @@ export const useCreateSeries = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['series'] });
+      queryClient.invalidateQueries({ queryKey: ['series_access_links_map'] });
       toast.success('Série criada com sucesso!');
     },
     onError: (err: any) => {
@@ -346,15 +347,29 @@ export const useUpdateSeries = () => {
       }
 
       // 2. Salvar link de entrega na tabela series_access_links
+      // NUNCA sobrescreve com link vazio para não apagar acidentalmente o link existente
       if (accessLink !== undefined) {
-        const { error: linkErr } = await supabase
-          .from('series_access_links')
-          .upsert({
-            series_id: id,
-            access_link: (accessLink || '').trim(),
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'series_id' });
-        if (linkErr) console.warn("Erro ao salvar access_link:", linkErr);
+        const cleanLink = (accessLink || '').trim();
+        if (cleanLink) {
+          const { error: linkErr } = await supabase
+            .from('series_access_links')
+            .upsert({
+              series_id: id,
+              access_link: cleanLink,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'series_id' });
+          if (linkErr) {
+            console.warn("Erro ao salvar access_link, tentando re-autenticação:", linkErr);
+            await ensureAdminAuth(true);
+            await supabase
+              .from('series_access_links')
+              .upsert({
+                series_id: id,
+                access_link: cleanLink,
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'series_id' });
+          }
+        }
       }
 
       return data;
@@ -407,6 +422,35 @@ export const useDeleteSeries = () => {
     onError: (err: any) => {
       console.error("Falha ao remover série:", err);
       toast.error('Erro ao remover série: ' + (err?.message || 'Verifique suas permissões'));
+    },
+  });
+};
+
+
+export const useSeriesAccessLinks = (enabled = true) => {
+  return useQuery({
+    queryKey: ['series_access_links_map'],
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      await ensureAdminAuth();
+      const { data, error } = await supabase
+        .from('series_access_links')
+        .select('series_id, access_link');
+
+      if (error) {
+        console.warn('Erro ao carregar mapa de links:', error);
+        return new Map<string, string>();
+      }
+
+      const map = new Map<string, string>();
+      data?.forEach((row) => {
+        if (row.series_id && row.access_link) {
+          map.set(row.series_id, row.access_link);
+        }
+      });
+      return map;
     },
   });
 };

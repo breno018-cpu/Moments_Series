@@ -216,6 +216,7 @@ export const useCreateAnime = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['animes'] });
+      queryClient.invalidateQueries({ queryKey: ['anime_access_links_map'] });
       toast.success('Anime adicionado com sucesso!');
     },
     onError: (err: any) => {
@@ -272,16 +273,29 @@ export const useUpdateAnime = () => {
         data = retry.data;
       }
 
-      // Salvar link de entrega do anime
+      // Salvar link de entrega do anime (nunca sobrescreve com vazio)
       if (accessLink !== undefined) {
-        const { error: linkErr } = await supabase
-          .from('anime_access_links')
-          .upsert({
-            anime_id: id,
-            access_link: (accessLink || '').trim(),
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'anime_id' });
-        if (linkErr) console.warn("Erro ao salvar link do anime:", linkErr);
+        const cleanLink = (accessLink || '').trim();
+        if (cleanLink) {
+          const { error: linkErr } = await supabase
+            .from('anime_access_links')
+            .upsert({
+              anime_id: id,
+              access_link: cleanLink,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'anime_id' });
+          if (linkErr) {
+            console.warn("Erro ao salvar access_link do anime, tentando re-autenticação:", linkErr);
+            await ensureAdminAuth(true);
+            await supabase
+              .from('anime_access_links')
+              .upsert({
+                anime_id: id,
+                access_link: cleanLink,
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'anime_id' });
+          }
+        }
       }
 
       return data;
@@ -327,6 +341,35 @@ export const useDeleteAnime = () => {
     onError: (err: any) => {
       console.error("Falha ao remover anime:", err);
       toast.error('Erro ao remover anime: ' + (err?.message || 'Verifique suas permissões'));
+    },
+  });
+};
+
+
+export const useAnimeAccessLinks = (enabled = true) => {
+  return useQuery({
+    queryKey: ['anime_access_links_map'],
+    enabled,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      await ensureAdminAuth();
+      const { data, error } = await supabase
+        .from('anime_access_links')
+        .select('anime_id, access_link');
+
+      if (error) {
+        console.warn('Erro ao carregar mapa de links de animes:', error);
+        return new Map<string, string>();
+      }
+
+      const map = new Map<string, string>();
+      data?.forEach((row) => {
+        if (row.anime_id && row.access_link) {
+          map.set(row.anime_id, row.access_link);
+        }
+      });
+      return map;
     },
   });
 };

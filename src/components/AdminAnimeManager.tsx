@@ -1,7 +1,8 @@
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAnimes, useCreateAnime, useUpdateAnime, useDeleteAnime, Anime } from '@/hooks/useAnimes';
+import { useAnimes, useCreateAnime, useUpdateAnime, useDeleteAnime, useAnimeAccessLinks, Anime } from '@/hooks/useAnimes';
+import { ensureAdminAuth } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,6 +17,7 @@ import { AdminCatalogSkeleton } from '@/components/AdminCatalogSkeleton';
 
 export const AdminAnimeManager = () => {
   const { data: animes, isLoading } = useAnimes();
+  const { data: animeAccessLinksMap = new Map<string, string>() } = useAnimeAccessLinks();
   const createAnime = useCreateAnime();
   const updateAnime = useUpdateAnime();
   const deleteAnime = useDeleteAnime();
@@ -58,6 +60,7 @@ export const AdminAnimeManager = () => {
   const handleEdit = (a: Anime) => {
     setEditingId(a.id);
     const numPrice = typeof a.price === 'number' ? a.price : Number(a.price) || 0;
+    const existingLink = animeAccessLinksMap.get(a.id) || a.access_link || '';
     setFormData({
       title: a.title || '',
       genre: a.genre || '',
@@ -66,23 +69,27 @@ export const AdminAnimeManager = () => {
       price: numPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       image_url: a.image_url || '',
       featured: Boolean(a.featured),
-      access_link: a.access_link || '',
+      access_link: existingLink,
       audio_type: (a.audio_type as 'dublado' | 'legendado') || 'legendado',
     });
     // Abre a modal de edição imediatamente para resposta visual instantânea
     setIsDialogOpen(true);
 
-    supabase
-      .from('anime_access_links')
-      .select('access_link')
-      .eq('anime_id', a.id)
-      .maybeSingle()
-      .then(({ data: linkRow }) => {
-        if (linkRow?.access_link) {
-          setFormData((prev) => ({ ...prev, access_link: linkRow.access_link }));
-        }
-      })
-      .catch((err) => console.warn('Erro ao carregar link do anime:', err));
+    if (!existingLink) {
+      ensureAdminAuth().then(() => {
+        supabase
+          .from('anime_access_links')
+          .select('access_link')
+          .eq('anime_id', a.id)
+          .maybeSingle()
+          .then(({ data: linkRow }) => {
+            if (linkRow?.access_link) {
+              setFormData((prev) => ({ ...prev, access_link: linkRow.access_link }));
+            }
+          })
+          .catch((err) => console.warn('Erro ao carregar link do anime:', err));
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -262,6 +269,15 @@ export const AdminAnimeManager = () => {
                         ANIME
                       </Badge>
                       {a.featured && <Badge className="text-[9px] bg-amber-50 text-amber-800 border border-amber-200 font-bold">Destaque</Badge>}
+                      {animeAccessLinksMap.has(a.id) ? (
+                        <Badge variant="outline" className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border-emerald-200">
+                          Link OK
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[9px] font-bold text-rose-700 bg-rose-50 border-rose-200">
+                          Sem Link
+                        </Badge>
+                      )}
                     </div>
                     <h3 className="font-extrabold text-sm sm:text-base text-zinc-950 truncate leading-tight">{a.title}</h3>
                     <p className="text-xs text-zinc-500 line-clamp-1">{a.genre || 'Geral'}</p>
